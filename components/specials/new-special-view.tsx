@@ -21,7 +21,7 @@ export function NewSpecialView({ clients = [], userClientId }: Props) {
     );
 }
 
-function Content({ clients, userClientId }: Props) {
+function Content({ clients = [], userClientId }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [submitting, setSubmitting] = useState(false);
