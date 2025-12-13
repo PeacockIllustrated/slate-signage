@@ -44,14 +44,14 @@ export function CreateScreenSetButton({ storeId }: { storeId: string }) {
                         <h2 className="text-xl font-bold mb-4">New Screen Set</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Set Name</label>
+                                <label className="block text-sm font-medium text-zinc-700">Set Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="e.g. Menu Boards"
-                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                                 />
                             </div>
                             <div className="flex justify-end space-x-3 mt-6">

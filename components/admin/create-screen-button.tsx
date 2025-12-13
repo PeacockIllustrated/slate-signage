@@ -51,22 +51,22 @@ export function CreateScreenButton({ screenSetId }: { screenSetId: string }) {
                         <h2 className="text-xl font-bold mb-4">Add New Screen</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Screen Name</label>
+                                <label className="block text-sm font-medium text-zinc-700">Screen Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Orientation</label>
+                                <label className="block text-sm font-medium text-zinc-700">Orientation</label>
                                 <select
                                     value={orientation}
                                     onChange={(e) => setOrientation(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                                 >
                                     <option value="landscape">Landscape (Horizontal)</option>
                                     <option value="portrait">Portrait (Vertical)</option>
@@ -74,11 +74,11 @@ export function CreateScreenButton({ screenSetId }: { screenSetId: string }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Display Type</label>
+                                <label className="block text-sm font-medium text-zinc-700">Display Type</label>
                                 <select
                                     value={displayType}
                                     onChange={(e) => setDisplayType(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                                 >
                                     <option value="pc">PC / Web Browser</option>
                                     <option value="android">Android / FireStick</option>
