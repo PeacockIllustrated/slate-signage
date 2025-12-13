@@ -21,7 +21,7 @@ export const ScreenSetSchema = z.object({
   id: z.string().uuid(),
   store_id: z.string().uuid(),
   name: z.string().min(1),
-  layout_hint: z.record(z.any()).optional().nullable(),
+  layout_hint: z.record(z.string(), z.any()).optional().nullable(),
   created_at: z.string(),
 });
 
