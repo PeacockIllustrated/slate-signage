@@ -1,0 +1,84 @@
+import Link from 'next/link';
+import { getSpecialsProjects } from './actions';
+import { createClient } from '@/lib/supabase/server';
+import { Plus } from 'lucide-react';
+import { ClientSelector } from '@/components/portal/client-selector';
+import { ProjectCard } from '@/components/specials/project-card';
+
+export default async function SpecialsListPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
+    const { clientId: searchClientId } = await searchParams;
+    const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return <div>Please login</div>;
+
+    // Fetch Role and Client Context
+    const { data: role } = await supabase.from('profiles').select('client_id, role').eq('id', user.id).single();
+
+    let activeClientId = role?.client_id;
+    let availableClients: { id: string, name: string }[] = [];
+
+    if (role?.role === 'super_admin') {
+        const { data: clients } = await supabase.from('clients').select('id, name').order('name');
+        availableClients = clients || [];
+        // Use search param if available, otherwise default to first client
+        activeClientId = searchClientId || availableClients[0]?.id;
+    }
+
+    if (!activeClientId) {
+        return (
+            <div className="p-8">
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold">Specials Builder</h1>
+                    <p className="text-gray-500">Create and manage your digital signage specials</p>
+                </div>
+                {role?.role === 'super_admin' ? (
+                    <div className="text-center py-12">
+                        <p className="mb-4 text-gray-500">Please select a client to view specials.</p>
+                        <ClientSelector clients={availableClients} activeClientId={activeClientId} />
+                    </div>
+                ) : (
+                    <div>No client associated with this account.</div>
+                )}
+            </div>
+        );
+    }
+
+    const projects = await getSpecialsProjects(activeClientId);
+
+    return (
+        <div className="p-8">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-2xl font-bold">Specials Builder</h1>
+                    <p className="text-gray-500">Create and manage your digital signage specials</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    {role?.role === 'super_admin' && (
+                        <ClientSelector clients={availableClients} activeClientId={activeClientId} />
+                    )}
+                    <Link
+                        href={`/app/specials/new?clientId=${activeClientId}`}
+                        className="bg-black text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-800"
+                    >
+                        <Plus size={18} />
+                        New Special
+                    </Link>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {projects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                ))}
+
+                {projects.length === 0 && (
+                    <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
+                        <p className="text-gray-500 mb-4">No specials created for this client yet</p>
+                        <Link href={`/app/specials/new?clientId=${activeClientId}`} className="text-blue-600 hover:underline">Create your first special</Link>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

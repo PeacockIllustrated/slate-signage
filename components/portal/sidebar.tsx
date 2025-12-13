@@ -12,6 +12,7 @@ const navigation = [
     { name: 'Clients', href: '/app/clients', icon: Users, adminOnly: true },
     /* { name: 'Stores', href: '/app/stores', icon: Store }, // Stores are usually accessed via Clients or Overview for Super Admin */
     { name: 'Media', href: '/app/media', icon: Image },
+    { name: 'Specials', href: '/app/specials', icon: Image }, // Using Image icon for now, or Star/Sparkles if available
     { name: 'Schedules', href: '/app/schedules', icon: Calendar },
 ]
 

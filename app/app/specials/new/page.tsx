@@ -1,0 +1,27 @@
+import { createClient } from '@/lib/supabase/server';
+import { NewSpecialView } from '@/components/specials/new-special-view';
+import { redirect } from 'next/navigation';
+
+export default async function NewSpecialPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        redirect('/auth/login');
+    }
+
+    // Fetch Profile Role
+    const { data: profile } = await supabase.from('profiles').select('client_id, role').eq('id', user.id).single();
+
+    let clients: { id: string, name: string }[] = [];
+    let userClientId: string | undefined = undefined;
+
+    if (profile?.role === 'super_admin') {
+        const { data: fetchedClients } = await supabase.from('clients').select('id, name').order('name');
+        clients = fetchedClients || [];
+    } else {
+        userClientId = profile?.client_id;
+    }
+
+    return <NewSpecialView clients={clients} userClientId={userClientId} />;
+}

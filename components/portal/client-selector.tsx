@@ -5,14 +5,14 @@ import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function ClientSelector({ clients }: { clients: { id: string, name: string }[] }) {
+export function ClientSelector({ clients, activeClientId }: { clients: { id: string, name: string }[], activeClientId?: string }) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [isOpen, setIsOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
-    const currentClientId = searchParams.get('clientId') || (clients.length > 0 ? clients[0].id : '')
+    const currentClientId = activeClientId || searchParams.get('clientId') || (clients.length > 0 ? clients[0].id : '')
     const selectedClient = clients.find(c => c.id === currentClientId) || clients[0]
 
     useEffect(() => {

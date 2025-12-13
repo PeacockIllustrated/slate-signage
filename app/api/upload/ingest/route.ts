@@ -92,8 +92,11 @@ export async function POST(request: NextRequest) {
 
             if (name.includes('vertical') || name.includes('screen_v_')) assignedOrientation = 'portrait'
 
-            // If we matched a rule AND we have a storeId (context), try to assign
+            // Get Public URL
+            const { data: { publicUrl } } = adminClient.storage.from('slate-media').getPublicUrl(storagePath)
+
             if (storeId && (assignedScreenIndex || assignedOrientation)) {
+                // ... (existing logic) ...
                 // Find matching screen in this store
                 let query = supabase.from('screens').select('id, refresh_version').eq('store_id', storeId)
 
@@ -118,12 +121,12 @@ export async function POST(request: NextRequest) {
                     // Increment Refresh Version
                     await supabase.from('screens').update({ refresh_version: (targetScreen.refresh_version || 0) + 1 }).eq('id', targetScreen.id)
 
-                    results.push({ file: file.name, status: 'assigned', screen: targetScreen.id })
+                    results.push({ file: file.name, status: 'assigned', screen: targetScreen.id, publicUrl, mediaId: asset.id })
                 } else {
-                    results.push({ file: file.name, status: 'uploaded_no_screen_match' })
+                    results.push({ file: file.name, status: 'uploaded_no_screen_match', publicUrl, mediaId: asset.id })
                 }
             } else {
-                results.push({ file: file.name, status: 'uploaded' })
+                results.push({ file: file.name, status: 'uploaded', publicUrl, mediaId: asset.id })
             }
         }
 
