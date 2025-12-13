@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
+export async function GET(request: NextRequest) {
     // ... params handling ...
     const searchParams = request.nextUrl.searchParams
     const token = searchParams.get('token')
