@@ -18,29 +18,29 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ c
         <div className="space-y-8">
             <div className="flex justify-between items-center">
                 <div>
-                    <Link href="/app" className="text-sm text-gray-500 hover:text-gray-900 mb-1 block">&larr; Back to Dashboard</Link>
-                    <h1 className="text-2xl font-bold text-gray-900">{client.name}</h1>
-                    <p className="text-gray-500">{client.slug}</p>
+                    <Link href="/app" className="text-sm text-zinc-500 hover:text-zinc-900 mb-1 block">&larr; Back to Dashboard</Link>
+                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">{client.name}</h1>
+                    <p className="text-zinc-500">{client.slug}</p>
                 </div>
             </div>
 
             {/* Stores Section */}
             <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium text-gray-900">Stores</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h3 className="text-lg font-bold tracking-wide uppercase text-zinc-900">Stores</h3>
                     <CreateStoreButton clientId={client.id} />
                 </div>
-                <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul role="list" className="divide-y divide-gray-200">
+                <div className="bg-white shadow overflow-hidden sm:rounded-md border border-zinc-200">
+                    <ul role="list" className="divide-y divide-zinc-200">
                         {stores?.map((store) => (
                             <li key={store.id}>
                                 <Link href={`/app/stores/${store.id}`} className="block hover:bg-gray-50 transition-colors">
                                     <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
                                         <div className="flex items-center">
-                                            <p className="text-sm font-medium text-black truncate">{store.name}</p>
+                                            <p className="text-sm font-medium text-zinc-900 truncate">{store.name}</p>
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <p className="text-sm text-gray-500 flex items-center">
+                                            <p className="text-sm text-zinc-500 flex items-center">
                                                 {store.screen_sets?.[0]?.count ?? 0} Screen Sets
                                             </p>
                                             <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -62,19 +62,19 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ c
 
             {/* Users Section */}
             <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium text-gray-900">Users</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h3 className="text-lg font-bold tracking-wide uppercase text-zinc-900">Users</h3>
                     <CreateUserButton clientId={client.id} />
                 </div>
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
                     <ul role="list" className="divide-y divide-gray-200">
                         {users?.map((user) => (
-                            <li key={user.id} className="px-4 py-4 sm:px-6 flex items-center justify-between">
+                            <li key={user.id} className="px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-zinc-50 transition-colors">
                                 <div>
-                                    <p className="text-sm font-medium text-black">{user.name || 'Unnamed User'}</p>
-                                    <p className="text-sm text-gray-500">{user.role}</p>
+                                    <p className="text-sm font-medium text-zinc-900">{user.name || 'Unnamed User'}</p>
+                                    <p className="text-sm text-zinc-500">{user.role}</p>
                                 </div>
-                                <div className="text-sm text-gray-400">
+                                <div className="text-sm text-zinc-400">
                                     {/* Email is not in profiles table? Need to join with auth or just show name */}
                                     {/* Profiles table in schema: id, role, client_id, name */}
                                     {/* We can't see email unless we join auth.users which is restricted. 

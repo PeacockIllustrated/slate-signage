@@ -51,12 +51,12 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
     return (
         <form action={handleUpdate} className="space-y-6">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Schedule Name</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Schedule Name</label>
                 <input
                     name="name"
                     type="text"
                     defaultValue={schedule.name}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                    className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                     required
                 />
             </div>
@@ -65,15 +65,15 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Days Active</label>
                 <div className="flex flex-wrap gap-2">
                     {DAYS.map(day => (
-                        <label key={day.id} className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded border border-gray-200 cursor-pointer hover:border-gray-400">
+                        <label key={day.id} className="flex items-center space-x-2 bg-zinc-50 px-3 py-2 rounded border border-zinc-200 cursor-pointer hover:border-zinc-400 font-medium">
                             <input
                                 type="checkbox"
                                 name="days"
                                 value={day.id}
                                 defaultChecked={schedule.days_of_week.includes(day.id)}
-                                className="rounded text-black focus:ring-black"
+                                className="rounded text-black focus:ring-black border-zinc-300"
                             />
-                            <span className="text-sm text-gray-700">{day.label}</span>
+                            <span className="text-sm text-zinc-700">{day.label}</span>
                         </label>
                     ))}
                 </div>
@@ -86,7 +86,7 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
                         name="startTime"
                         type="time"
                         defaultValue={schedule.start_time}
-                        className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                         required
                     />
                 </div>
@@ -100,13 +100,13 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
                         // Actually standard input time expects HH:MM, Postgres often gives HH:MM:SS.
                         // Let's safe slice.
                         key={schedule.end_time} // Force re-render if needed
-                        className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                         required
                     />
                 </div>
             </div>
 
-            <div className="pt-4 flex justify-between items-center border-t border-gray-100 mt-6">
+            <div className="pt-4 flex justify-between items-center border-t border-zinc-100 mt-6">
                 <button
                     type="button"
                     onClick={handleDelete}

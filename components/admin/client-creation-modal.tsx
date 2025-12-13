@@ -38,7 +38,7 @@ export function ClientCreationModal({ isOpen, onClose }: { isOpen: boolean; onCl
                 <h2 className="text-xl font-bold mb-4">Create New Client</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Client Name</label>
+                        <label className="block text-sm font-medium text-zinc-700">Client Name</label>
                         <input
                             type="text"
                             required
@@ -48,17 +48,17 @@ export function ClientCreationModal({ isOpen, onClose }: { isOpen: boolean; onCl
                                 // Auto-slug
                                 if (!slug) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-'))
                             }}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Slug (Unique ID)</label>
+                        <label className="block text-sm font-medium text-zinc-700">Slug (Unique ID)</label>
                         <input
                             type="text"
                             required
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
-                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
+                            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black sm:text-sm"
                         />
                     </div>
                     <div className="flex justify-end space-x-3 mt-6">

@@ -12,7 +12,7 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
     if (!schedule) return notFound()
 
     // Fetch Screens in this store
-    const { data: screens } = await supabase.from('screens').select('id, name').eq('store_id', schedule.store_id)
+    const { data: screens } = await supabase.from('screens').select('id, name').eq('store_id', schedule.store_id).order('name')
 
     // Fetch Media in this client
     const { data: media } = await supabase.from('media_assets').select('*').eq('client_id', schedule.store.client_id)

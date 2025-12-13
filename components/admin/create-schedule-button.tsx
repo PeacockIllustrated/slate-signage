@@ -52,11 +52,11 @@ export function CreateScheduleButton({ stores }: { stores: { id: string, name: s
 
                         <form action={handleSubmit} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Store</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1">Store</label>
                                 <select
                                     value={selectedStore}
                                     onChange={(e) => setSelectedStore(e.target.value)}
-                                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                                    className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                                     required
                                 >
                                     <option value="">Select a Store</option>
@@ -67,23 +67,23 @@ export function CreateScheduleButton({ stores }: { stores: { id: string, name: s
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Schedule Name</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-1">Schedule Name</label>
                                 <input
                                     name="name"
                                     type="text"
                                     placeholder="e.g. Breakfast Menu"
-                                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                                    className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Days Active</label>
+                                <label className="block text-sm font-medium text-zinc-700 mb-2">Days Active</label>
                                 <div className="flex flex-wrap gap-2">
                                     {DAYS.map(day => (
-                                        <label key={day.id} className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded border border-gray-200 cursor-pointer hover:border-gray-400">
-                                            <input type="checkbox" name="days" value={day.id} defaultChecked className="rounded text-black focus:ring-black" />
-                                            <span className="text-sm text-gray-700">{day.label}</span>
+                                        <label key={day.id} className="flex items-center space-x-2 bg-zinc-50 px-3 py-2 rounded border border-zinc-200 cursor-pointer hover:border-zinc-400 font-medium">
+                                            <input type="checkbox" name="days" value={day.id} defaultChecked className="rounded text-black focus:ring-black border-zinc-300" />
+                                            <span className="text-sm text-zinc-700">{day.label}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -96,7 +96,7 @@ export function CreateScheduleButton({ stores }: { stores: { id: string, name: s
                                         name="startTime"
                                         type="time"
                                         defaultValue="09:00"
-                                        className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                                         required
                                     />
                                 </div>
@@ -106,7 +106,7 @@ export function CreateScheduleButton({ stores }: { stores: { id: string, name: s
                                         name="endTime"
                                         type="time"
                                         defaultValue="17:00"
-                                        className="w-full border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
                                         required
                                     />
                                 </div>

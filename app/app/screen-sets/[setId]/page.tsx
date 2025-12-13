@@ -28,7 +28,7 @@ export default async function ScreenSetPage({ params }: { params: Promise<{ setI
     `)
         .eq('screen_set_id', setId)
         .eq('screen_content.active', true)
-        .order('index_in_set')
+        .order('name', { ascending: true })
 
     // Group screens
     const landscapeScreens = screens?.filter(s => s.orientation !== 'portrait') || []

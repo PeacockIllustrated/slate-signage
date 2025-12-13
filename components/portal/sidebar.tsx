@@ -23,8 +23,8 @@ export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin'
 
     const NavContent = () => (
         <>
-            <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
-                <h1 className="text-xl font-bold tracking-tight">Slate</h1>
+            <div className="flex items-center px-6 h-16 border-b border-zinc-200">
+                <img src="/slate-logo.png" alt="Slate" className="h-6 w-auto" />
             </div>
             <div className="flex-1 flex flex-col overflow-y-auto pt-5 pb-4">
                 <nav className="mt-5 flex-1 px-2 space-y-1">
@@ -39,14 +39,14 @@ export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin'
                                 onClick={() => setIsOpen(false)}
                                 className={cn(
                                     isActive
-                                        ? 'bg-gray-100 text-gray-900'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                        ? 'bg-zinc-100 text-zinc-900'
+                                        : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                                     'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors'
                                 )}
                             >
                                 <item.icon
                                     className={cn(
-                                        isActive ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-500',
+                                        isActive ? 'text-zinc-900' : 'text-zinc-400 group-hover:text-zinc-500',
                                         'mr-3 flex-shrink-0 h-5 w-5 transition-colors'
                                     )}
                                     aria-hidden="true"
@@ -57,13 +57,13 @@ export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin'
                     })}
                 </nav>
             </div>
-            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+            <div className="flex-shrink-0 flex border-t border-zinc-200 p-4">
                 <form action={logout} className="w-full">
                     <button className="flex-shrink-0 w-full group block">
                         <div className="flex items-center">
                             <LogOut className="inline-block h-5 w-5 text-gray-400 group-hover:text-gray-500" />
                             <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                                <p className="text-sm font-medium text-zinc-700 group-hover:text-zinc-900">
                                     Sign out
                                 </p>
                             </div>
@@ -78,7 +78,7 @@ export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin'
         <>
             {/* Mobile Trigger */}
             <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center px-4 justify-between">
-                <h1 className="text-xl font-bold tracking-tight">Slate</h1>
+                <img src="/slate-logo.png" alt="Slate" className="h-6 w-auto" />
                 <button onClick={toggle} className="p-2 -mr-2 text-gray-600 hover:text-gray-900">
                     <Menu className="h-6 w-6" />
                 </button>

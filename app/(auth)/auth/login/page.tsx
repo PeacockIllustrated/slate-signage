@@ -28,10 +28,10 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Slate Signage
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
+                    <div className="flex justify-center">
+                        <img src="/slate-logo.png" alt="Slate" className="h-8 w-auto" />
+                    </div>
+                    <p className="mt-2 text-center text-sm text-zinc-600">
                         Sign in to your dashboard
                     </p>
                 </div>
@@ -48,7 +48,7 @@ export default function LoginPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-zinc-300 placeholder-zinc-500 text-zinc-900 rounded-t-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                                 placeholder="Email address"
                             />
                         </div>
@@ -62,7 +62,7 @@ export default function LoginPage() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-zinc-300 placeholder-zinc-500 text-zinc-900 rounded-b-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                                 placeholder="Password"
                             />
                         </div>

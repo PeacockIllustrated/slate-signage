@@ -48,24 +48,17 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                    <h1 className="text-2xl font-bold text-gray-900">Media Library</h1>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Media Library</h1>
                     {role?.role === 'super_admin' && (
                         <ClientSelector clients={availableClients} />
                     )}
                 </div>
-                <div className="flex gap-2">
-                    {/* Debug Info */}
-                    <div className="text-xs text-gray-400 border border-gray-200 p-2 rounded">
-                        Active Client: {activeClientId || 'None'} <br />
-                        Role: {role?.role} <br />
-                        Clients: {availableClients.length}
-                    </div>
-
+                <div className="flex gap-2 w-full md:w-auto">
                     <MediaUploader
                         clientId={activeClientId}
-                        btnClassName="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
+                        btnClassName="w-full md:w-auto bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-zinc-800 transition-colors"
                     />
                 </div>
             </div>
@@ -73,7 +66,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
             {/* Simple Gallery Grid */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {assets?.map((asset) => (
-                    <div key={asset.id} className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <div key={asset.id} className="group relative aspect-square bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
                         <SignedImage path={asset.storage_path} alt={asset.filename} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs">
                             {Math.round((asset.bytes || 0) / 1024)} KB
