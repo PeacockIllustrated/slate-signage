@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { CreateClientButton } from '@/components/admin/create-client-button'
+import { CreditCard } from 'lucide-react'
 
 async function DashboardContent() {
     const supabase = await createClient()
@@ -24,15 +25,31 @@ async function DashboardContent() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {clients?.map((client) => (
-                        <Link href={`/app/clients/${client.id}`} key={client.id} className="block p-6 bg-white rounded-lg border border-zinc-200 hover:border-black transition-colors shadow-sm">
-                            <h3 className="text-lg font-bold tracking-wide uppercase text-zinc-900">{client.name}</h3>
-                            <p className="text-sm text-zinc-500 mt-1">{client.slug}</p>
-                            <div className="mt-4 flex items-center text-sm text-zinc-500">
-                                <span className="bg-zinc-100 text-zinc-700 font-bold uppercase tracking-wider py-1 px-2 rounded-full text-xs">
-                                    {client.stores?.[0]?.count ?? 0} Stores
-                                </span>
+                        <div key={client.id} className="relative group p-6 bg-white rounded-lg border border-zinc-200 hover:border-black transition-colors shadow-sm">
+                            <Link href={`/app/clients/${client.id}`} className="absolute inset-0 z-0">
+                                <span className="sr-only">View Client</span>
+                            </Link>
+
+                            <div className="relative z-10 pointer-events-none">
+                                <div className="flex justify-between items-start">
+                                    <h3 className="text-lg font-bold tracking-wide uppercase text-zinc-900 pr-8">{client.name}</h3>
+                                </div>
+                                <p className="text-sm text-zinc-500 mt-1">{client.slug}</p>
+                                <div className="mt-4 flex items-center text-sm text-zinc-500">
+                                    <span className="bg-zinc-100 text-zinc-700 font-bold uppercase tracking-wider py-1 px-2 rounded-full text-xs">
+                                        {client.stores?.[0]?.count ?? 0} Stores
+                                    </span>
+                                </div>
                             </div>
-                        </Link>
+
+                            <Link
+                                href={`/app/clients/${client.id}/plan`}
+                                className="absolute top-4 right-4 z-20 p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-full transition-colors"
+                                title="Manage Plan"
+                            >
+                                <CreditCard size={18} />
+                            </Link>
+                        </div>
                     ))}
                 </div>
             </div>

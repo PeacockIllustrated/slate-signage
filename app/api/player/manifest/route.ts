@@ -15,16 +15,40 @@ export async function GET(request: NextRequest) {
     // 1. Find Screen by Token
     const { data: screen } = await supabase
         .from('screens')
-        .select('id, store_id, refresh_version')
+        .select('id, store_id, refresh_version, store:stores(client_id)')
         .eq('player_token', token)
-        .single()
+        .single() // @ts-ignore
 
     if (!screen) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    // 2. Resolve Content (Server-Side Logic)
-    // We call the Postgres function resolve_screen_media
+    // 2. Fetch Plan & Status
+    // @ts-ignore
+    const clientId = screen.store?.client_id
+    const { data: planRaw } = await supabase.from('client_plans').select('*').eq('client_id', clientId).single()
+
+    const plan = planRaw || {
+        status: 'active',
+        video_enabled: false // Default to safe if missing
+    }
+
+    // Check Plan Status
+    if (plan.status === 'paused' || plan.status === 'cancelled') {
+        return NextResponse.json({
+            screen_id: screen.id,
+            refresh_version: screen.refresh_version,
+            media: {
+                id: null,
+                url: 'https://images.unsplash.com/photo-1518600506278-4e8ef466b810?q=80&w=2546&auto=format&fit=crop', // Generic "Service Paused" placeholder
+                type: 'image/jpeg'
+            },
+            next_check: new Date(Date.now() + 60000).toISOString(), // Check back in 1 min
+            fetched_at: new Date().toISOString()
+        })
+    }
+
+    // 3. Resolve Content (Server-Side Logic)
     const { data: mediaId } = await supabase
         .rpc('resolve_screen_media', {
             p_screen_id: screen.id,
@@ -42,15 +66,25 @@ export async function GET(request: NextRequest) {
             .single()
 
         if (media) {
-            // Generate Signed URL
-            const { data: signed } = await supabase
-                .storage
-                .from('slate-media')
-                .createSignedUrl(media.storage_path, 3600) // 1 Hour
+            const isVideo = media.mime.startsWith('video/')
 
-            if (signed) {
-                mediaUrl = signed.signedUrl
-                mimeType = media.mime
+            if (isVideo && !plan.video_enabled) {
+                // Fallback: Plan doesn't allow video
+                // Ideally attempt to find latest image, but for now safe placeholder
+                // TODO: Implement "latest static image" lookup?
+                mediaUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop' // "Nice Abstract" fallback
+                mimeType = 'image/jpeg'
+            } else {
+                // Generate Signed URL
+                const { data: signed } = await supabase
+                    .storage
+                    .from('slate-media')
+                    .createSignedUrl(media.storage_path, 3600) // 1 Hour
+
+                if (signed) {
+                    mediaUrl = signed.signedUrl
+                    mimeType = media.mime
+                }
             }
         }
     }

@@ -51,6 +51,19 @@ export async function registerMediaAsset(
     const adminClient = await createAdminClient();
 
     try {
+        // Check Entitlement (New)
+        if (mimeType.startsWith('video/') || filename.match(/\.(mp4|mov|webm)$/i)) {
+            // Since this action accepts clientId, we should verify it matches the user 
+            // IF we rely on getEntitlements() which uses auth.getUser().
+            // If this action is called by super admin for a client, getEntitlements() might fail or return admin plan.
+            // We can use the clientId passed in to check the plan directly if super admin, 
+            // or just rely on getEntitlements() if it's the user acting.
+            // Given the context is likely "User Uploading", getEntitlements is correct.
+            const { getEntitlements, assertEntitlement } = await import('@/lib/auth/getEntitlements.server')
+            const entitlements = await getEntitlements()
+            assertEntitlement(entitlements, 'video_enabled')
+        }
+
         // 1. Create DB Record
         const { data: asset, error: dbError } = await supabase
             .from('media_assets')

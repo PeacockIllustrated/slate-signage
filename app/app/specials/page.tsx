@@ -44,13 +44,43 @@ export default async function SpecialsListPage({ searchParams }: { searchParams:
         );
     }
 
+    // Check Entitlements (New)
+    const { data: plan } = await supabase.from('client_plans').select('specials_studio_enabled').eq('client_id', activeClientId).single();
+    // Default false if no plan found (safe default)
+    const isEnabled = plan?.specials_studio_enabled ?? false;
+
+    if (!isEnabled) {
+        const { UpgradeGate } = await import('@/components/billing/UpgradeGate');
+        return (
+            <div className="p-8 h-full flex flex-col">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-2xl font-extrabold uppercase tracking-wide text-zinc-900">Specials Studio</h1>
+                        <p className="text-gray-500">Manage digital signage content.</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                        {role?.role === 'super_admin' && (
+                            <ClientSelector clients={availableClients} activeClientId={activeClientId} />
+                        )}
+                    </div>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                    <UpgradeGate
+                        title="Specials Studio Included in Slate Video"
+                        description="Unlock our powerful drag-and-drop editor with designer-approved templates."
+                    />
+                </div>
+            </div>
+        );
+    }
+
     const projects = await getSpecialsProjects(activeClientId);
 
     return (
         <div className="p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold uppercase tracking-wide">Specials Studio</h1>
+                    <h1 className="text-2xl font-extrabold uppercase tracking-wide text-zinc-900">Specials Studio</h1>
                     <p className="text-gray-500">Manage digital signage content.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
