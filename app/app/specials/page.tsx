@@ -29,8 +29,8 @@ export default async function SpecialsListPage({ searchParams }: { searchParams:
         return (
             <div className="p-8">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold">Specials Builder</h1>
-                    <p className="text-gray-500">Create and manage your digital signage specials</p>
+                    <h1 className="text-2xl font-bold uppercase tracking-wide">Specials Studio</h1>
+                    <p className="text-gray-500">Manage digital signage content.</p>
                 </div>
                 {role?.role === 'super_admin' ? (
                     <div className="text-center py-12">
@@ -48,21 +48,21 @@ export default async function SpecialsListPage({ searchParams }: { searchParams:
 
     return (
         <div className="p-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Specials Builder</h1>
-                    <p className="text-gray-500">Create and manage your digital signage specials</p>
+                    <h1 className="text-2xl font-bold uppercase tracking-wide">Specials Studio</h1>
+                    <p className="text-gray-500">Manage digital signage content.</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
                     {role?.role === 'super_admin' && (
                         <ClientSelector clients={availableClients} activeClientId={activeClientId} />
                     )}
                     <Link
                         href={`/app/specials/new?clientId=${activeClientId}`}
-                        className="bg-black text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-800"
+                        className="bg-black text-white px-4 py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
                     >
                         <Plus size={18} />
-                        New Special
+                        Prepare Screen
                     </Link>
                 </div>
             </div>

@@ -5,13 +5,14 @@ import dynamic from 'next/dynamic';
 import { notFound, useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { SpecialsProject, SpecialNode, CANVAS_PRESETS } from '@/components/specials/types';
-import { updateSpecialsProject, deleteSpecialsProject, publishSpecialThumbnail } from '../actions';
+import { updateSpecialsProject, deleteSpecialsProject, publishSpecialThumbnail, createTemplate } from '../actions';
 import { LayersPanel } from '@/components/specials/LayersPanel';
 import { PropertiesPanel } from '@/components/specials/PropertiesPanel';
-import { Loader2, ArrowLeft, Save, Upload, Type, Image as ImageIcon, Square, Circle, Undo, Redo, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Save, Upload, Type, Image as ImageIcon, Square, Circle, Undo, Redo, Trash2, Layers, Settings, Monitor, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
 import { EDITOR_FONTS } from '@/components/specials/fonts';
+import { PublishModal } from '@/components/specials/PublishModal';
 
 // Dynamically import Editor to avoid SSR issues with Konva
 const Editor = dynamic(() => import('@/components/specials/Editor'), {
@@ -28,6 +29,9 @@ export default function EditSpecialPage() {
     const [projectName, setProjectName] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [showPublishModal, setShowPublishModal] = useState(false);
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
+    const [templateName, setTemplateName] = useState('');
 
     // Node State & History
     const [nodes, setNodes] = useState<SpecialNode[]>([]);
@@ -37,6 +41,10 @@ export default function EditSpecialPage() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const editorRef = useRef<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Mobile UI State
+    const [showMobileLayers, setShowMobileLayers] = useState(false);
+    const [showMobileProperties, setShowMobileProperties] = useState(false);
 
     useEffect(() => {
         const fetchProject = async () => {
@@ -52,6 +60,7 @@ export default function EditSpecialPage() {
             } else {
                 setProject(data);
                 setProjectName(data.name);
+                setTemplateName(data.name + ' Template');
                 const initialNodes = data.design_json?.nodes || [];
                 setNodes(initialNodes);
                 setHistory([initialNodes]);
@@ -223,6 +232,69 @@ export default function EditSpecialPage() {
         }
     };
 
+    const handleSaveTemplate = async () => {
+        if (!project || !editorRef.current || !templateName) return;
+        setSaving(true);
+        try {
+            // 1. Generate Thumbnail (Duplicate logic for simplicity/safety)
+            const stage = editorRef.current.getStage();
+            let thumbnailUrl = undefined;
+
+            if (stage) {
+                const prevSelected = selectedId;
+                setSelectedId(null);
+                await new Promise(r => setTimeout(r, 50));
+
+                const preset = CANVAS_PRESETS[project.canvas_preset as keyof typeof CANVAS_PRESETS];
+                const targetWidth = 400;
+                const pixelRatio = targetWidth / (stage.width());
+
+                const dataUrl = stage.toDataURL({
+                    pixelRatio: pixelRatio,
+                    mimeType: 'image/jpeg',
+                    quality: 0.8
+                });
+                setSelectedId(prevSelected);
+
+                const res = await fetch(dataUrl);
+                const blob = await res.blob();
+                const file = new File([blob], 'template-thumb.jpg', { type: 'image/jpeg' });
+
+                const supabase = createClient();
+                // Store in a templates folder? or reuse thumbnails folder
+                // Use a unique ID for template thumbnail
+                const thumbId = uuidv4();
+                const path = `${project.client_id}/thumbnails/${thumbId}.jpg`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('slate-media')
+                    .upload(path, file, { upsert: true });
+
+                if (!uploadError) {
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('slate-media')
+                        .getPublicUrl(path);
+                    thumbnailUrl = publicUrl;
+                }
+            }
+
+            const designJson = {
+                ...project.design_json,
+                nodes: nodes
+            };
+
+            await createTemplate(project.client_id, templateName, project.canvas_preset, designJson, thumbnailUrl);
+            setShowTemplateModal(false);
+            alert('Template created successfully!');
+
+        } catch (e: any) {
+            console.error(e);
+            alert(`Failed to create template: ${e.message}`);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleDeleteProject = async () => {
         if (!project) return;
         if (!confirm('Are you sure you want to delete this specific project? This cannot be undone.')) return;
@@ -239,7 +311,7 @@ export default function EditSpecialPage() {
 
     const handlePublish = async () => {
         if (!project || !editorRef.current) return;
-        if (!confirm('This will create a new media asset and upload it. Continue?')) return;
+
         setSaving(true);
         try {
             const stage = editorRef.current.getStage();
@@ -297,6 +369,7 @@ export default function EditSpecialPage() {
                 design_json: designJson
             });
 
+            setShowPublishModal(false);
             alert('Published successfully! The image is available in your Media Library.');
 
         } catch (e: any) {
@@ -318,34 +391,80 @@ export default function EditSpecialPage() {
     const presetName = project?.canvas_preset || 'landscape_1080';
     const presetDimensions = CANVAS_PRESETS[presetName as keyof typeof CANVAS_PRESETS] || CANVAS_PRESETS.landscape_1080;
     const selectedNode = nodes.find(n => n.id === selectedId) || null;
+    const isPortrait = presetName.includes('portrait');
 
     return (
-        <div className="h-screen flex flex-col">
+        <div className="h-screen flex flex-col bg-zinc-50">
             <style jsx global>{`
                 ${EDITOR_FONTS.map(font => `@import url('${font.url}');`).join('\n')}
             `}</style>
 
+            <PublishModal
+                isOpen={showPublishModal}
+                onClose={() => setShowPublishModal(false)}
+                onPublish={handlePublish}
+                project={project}
+                saving={saving}
+            />
+
+            {/* Template Modal */}
+            {showTemplateModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+                        <h3 className="text-lg font-bold mb-4">Save as Template</h3>
+                        <p className="text-sm text-gray-500 mb-4">Create a reusable template from your current design.</p>
+                        <div className="mb-4">
+                            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Template Name</label>
+                            <input
+                                type="text"
+                                value={templateName}
+                                onChange={(e) => setTemplateName(e.target.value)}
+                                className="w-full border rounded px-3 py-2 outline-none focus:border-black"
+                                placeholder="Enter template name..."
+                                autoFocus
+                            />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setShowTemplateModal(false)}
+                                className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveTemplate}
+                                disabled={saving || !templateName.trim()}
+                                className="px-4 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {saving && <Loader2 size={14} className="animate-spin" />}
+                                Create Template
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
-            <div className="h-14 border-b flex items-center justify-between px-4 bg-white z-10 shrink-0">
-                <div className="flex items-center gap-4 flex-1">
-                    <Link href="/app/specials" className="p-2 hover:bg-zinc-100 rounded-full text-zinc-500">
+            <div className="h-14 border-b flex items-center justify-between px-2 md:px-4 bg-white z-10 shrink-0 gap-2 shadow-sm">
+                <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+                    <Link href="/app/specials" className="p-2 hover:bg-zinc-100 rounded-full text-zinc-500 shrink-0">
                         <ArrowLeft size={20} />
                     </Link>
-                    <div className="flex items-center gap-3 flex-1 max-w-md">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                         <input
                             type="text"
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
                             onBlur={handleSave}
-                            className="font-bold text-xl text-zinc-900 bg-transparent hover:bg-zinc-50 focus:bg-white border border-transparent focus:border-zinc-200 rounded px-2 py-0.5 outline-none transition-all w-full"
+                            className="font-bold text-lg md:text-xl text-zinc-900 bg-transparent hover:bg-zinc-50 focus:bg-white border border-transparent focus:border-zinc-200 rounded px-2 py-0.5 outline-none transition-all w-full min-w-0 truncate"
                         />
-                        <span className="text-xs text-zinc-400 bg-zinc-100 px-2 py-1 rounded font-medium border border-zinc-200 whitespace-nowrap">
-                            {project?.canvas_preset === 'portrait_1080' ? '1080x1920' : '1920x1080'}
+                        <span className="hidden md:inline-block text-[10px] uppercase font-bold text-zinc-400 bg-zinc-50 px-2 py-1 rounded border border-zinc-100 whitespace-nowrap">
+                            {isPortrait ? 'Portrait 1080x1920' : 'Landscape 1920x1080'}
                         </span>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 mx-4">
+                <div className="hidden md:flex items-center gap-1 mx-4">
                     <button onClick={handleUndo} disabled={historyStep === 0} title="Undo (Ctrl+Z)" className="p-2 hover:bg-zinc-100 rounded text-zinc-600 disabled:opacity-30">
                         <Undo size={18} />
                     </button>
@@ -358,31 +477,41 @@ export default function EditSpecialPage() {
                     </button>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
+                    <button
+                        onClick={() => setShowTemplateModal(true)}
+                        disabled={saving}
+                        title="Save as Template"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase text-zinc-600 bg-white border hover:bg-zinc-50 rounded shadow-sm transition-colors disabled:opacity-50 mr-2"
+                    >
+                        <Copy size={14} />
+                        <span className="hidden md:inline">Save as Template</span>
+                    </button>
+
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-md transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase text-zinc-600 bg-white border hover:bg-zinc-50 rounded shadow-sm transition-colors disabled:opacity-50"
                     >
-                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                        Save
+                        {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        <span className="hidden md:inline">Save Draft</span>
                     </button>
                     <button
-                        onClick={handlePublish}
+                        onClick={() => setShowPublishModal(true)}
                         disabled={saving}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-black hover:bg-zinc-800 rounded-md transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase text-white bg-black hover:bg-zinc-800 rounded shadow-sm transition-colors disabled:opacity-50 ml-2"
                     >
-                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                        Publish
+                        {saving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                        <span className="hidden md:inline">Publish to Screens</span>
                     </button>
                 </div>
             </div>
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Left Sidebar */}
-                <div className="w-64 border-r bg-white flex flex-col shrink-0">
-                    <div className="p-3 border-b">
-                        <h3 className="font-semibold text-sm text-zinc-900">Layers</h3>
+                <div className="w-64 border-r bg-white hidden md:flex flex-col shrink-0 z-10">
+                    <div className="p-3 border-b bg-zinc-50/50">
+                        <h3 className="font-bold text-xs uppercase tracking-wide text-zinc-500">Layers</h3>
                     </div>
                     <div className="flex-1 overflow-y-auto">
                         <LayersPanel
@@ -417,7 +546,6 @@ export default function EditSpecialPage() {
                     </div>
 
                     {/* Toolbar */}
-                    {/* Toolbar */}
                     <div className="p-3 border-t bg-zinc-50 grid grid-cols-4 gap-2">
                         <button onClick={() => {
                             pushToHistory([...nodes, {
@@ -431,12 +559,12 @@ export default function EditSpecialPage() {
                                 width: 300
                             }]);
                         }} className="flex flex-col items-center gap-1 p-2 rounded hover:bg-white hover:shadow-sm transition-all text-zinc-600">
-                            <Type size={20} />
-                            <span className="text-[10px]">Text</span>
+                            <Type size={16} />
+                            <span className="text-[9px] font-medium uppercase">Text</span>
                         </button>
                         <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1 p-2 rounded hover:bg-white hover:shadow-sm transition-all text-zinc-600">
-                            <ImageIcon size={20} />
-                            <span className="text-[10px]">Image</span>
+                            <ImageIcon size={16} />
+                            <span className="text-[9px] font-medium uppercase">Image</span>
                         </button>
                         <input
                             ref={fileInputRef}
@@ -454,8 +582,8 @@ export default function EditSpecialPage() {
                                 fill: '#e4e4e7'
                             }]);
                         }} className="flex flex-col items-center gap-1 p-2 rounded hover:bg-white hover:shadow-sm transition-all text-zinc-600">
-                            <Square size={20} />
-                            <span className="text-[10px]">Rect</span>
+                            <Square size={16} />
+                            <span className="text-[9px] font-medium uppercase">Box</span>
                         </button>
                         <button onClick={() => {
                             pushToHistory([...nodes, {
@@ -466,68 +594,207 @@ export default function EditSpecialPage() {
                                 fill: '#e4e4e7'
                             }]);
                         }} className="flex flex-col items-center gap-1 p-2 rounded hover:bg-white hover:shadow-sm transition-all text-zinc-600">
-                            <Circle size={20} />
-                            <span className="text-[10px]">Circle</span>
+                            <Circle size={16} />
+                            <span className="text-[9px] font-medium uppercase">Circle</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Center - Canvas */}
-                <div className="flex-1 bg-gray-100 flex items-center justify-center overflow-auto p-8">
-                    <Editor
-                        ref={editorRef}
-                        nodes={nodes}
-                        onNodesChange={(newNodes) => {
-                            // Only push to history if actually changed (drag end)
-                            // Editor calls onNodesChange on drag end.
-                            // We might get partial updates so we should compare or just debouce?
-                            // For now assuming drag end calls this once.
-                            pushToHistory(newNodes);
-                        }}
-                        selectedId={selectedId}
-                        onSelect={setSelectedId}
-                        preset={project.canvas_preset as any}
-                        backgroundColor={project.design_json?.backgroundColor}
-                    />
+                <div className="flex-1 bg-zinc-100 flex flex-col overflow-hidden relative">
+                    <div className="absolute top-4 left-0 right-0 flex justify-center z-10 pointer-events-none">
+                        <div className="bg-black/5 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 border border-black/5">
+                            <Monitor size={12} className="text-black/40" />
+                            <span className="text-[10px] uppercase font-bold text-black/40">Live Screen Preview</span>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-auto flex items-center justify-center p-8 md:p-12">
+                        {/* Screen Mock Container */}
+                        <div className="relative shadow-2xl ring-1 ring-black/5 rounded-[2px] overflow-hidden bg-black">
+                            {/* Bezel */}
+                            <div className="absolute inset-0 border-[12px] border-zinc-900 pointer-events-none z-20 rounded-[2px]"></div>
+
+                            {/* Editor */}
+                            <div className="relative z-10">
+                                <Editor
+                                    ref={editorRef}
+                                    nodes={nodes}
+                                    onNodesChange={(newNodes) => {
+                                        pushToHistory(newNodes);
+                                    }}
+                                    selectedId={selectedId}
+                                    onSelect={setSelectedId}
+                                    preset={project.canvas_preset as any}
+                                    backgroundColor={project.design_json?.backgroundColor}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Right Panel - Properties */}
-                <div className="w-80 border-l bg-white shrink-0">
-                    <PropertiesPanel
-                        selectedNode={selectedNode}
-                        onUpdate={(updates) => {
-                            // Immediate update for UI, but debounced history?
-                            // For simplicty, push to history on every change? No, that's too much (spamming undo for 1px drag).
-                            // Ideally PropertiesPanel should have onUpdateEnd or similar.
-                            // For now assuming drag end calls this once.
-                            // For now, let's just update nodes directly and maybe not push history for every single character type?
-                            // Actually, let's update state directly and maybe push history on blur?
-                            // Complex. Let's just update nodes state without history for properties, 
-                            // and let user manually save or rely on 'onNodesChange'?? No properties panel updates nodes.
-                            // Let's create a 'pushHistory' wrapper that we only call sometimes?
-                            // For now, we update nodes directly, and we lose undo for property changes unless we structure it better.
-                            // Wait, user expects Undo to work for properties.
-                            // I will use direct setNodes for now to keep it responsive, and maybe debounce history?
-                            // Or just push history. It is fine for now.
-                            const newNodes = nodes.map(n => n.id === selectedId ? { ...n, ...updates } : n);
-                            setNodes(newNodes);
-                            // We need to sync history eventually. 
-                            // Let's just update history here too, but maybe replace the last history item if it's the same node being edited?
-                            // That's complex. Let's just set Nodes.
-                            // To make Undo work for properties, we'd need to pushToHistory(newNodes).
-                            // But typing in a text box calls this on every keystroke. Bad.
-                            // Compromise: Update nodes directly. Add a "Save Snapshot" or use Debounce.
-                            // I will leave it as setNodes (no history) for high-frequency property updates for now to avoid freezing, 
-                            // UNLESS I implement a specialized debounce or 'final' commit.
-                            // Actually, let's try to pass a 'commit' flag? No properties panel is simple.
-                            // Fine, I will push history.
-                            pushToHistory(newNodes);
-                        }}
-                        canvasWidth={presetDimensions.width}
-                        canvasHeight={presetDimensions.height}
-                    />
+                <div className="w-80 border-l bg-white shrink-0 hidden md:flex flex-col z-10">
+                    <div className="p-3 border-b bg-zinc-50/50">
+                        <h3 className="font-bold text-xs uppercase tracking-wide text-zinc-500">Properties</h3>
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                        <PropertiesPanel
+                            selectedNode={selectedNode}
+                            onUpdate={(updates) => {
+                                const newNodes = nodes.map(n => n.id === selectedId ? { ...n, ...updates } : n);
+                                setNodes(newNodes);
+                                pushToHistory(newNodes);
+                            }}
+                            canvasWidth={presetDimensions.width}
+                            canvasHeight={presetDimensions.height}
+                        />
+                    </div>
                 </div>
             </div>
+
+            {/* Mobile Bottom Toolbar */}
+            <div className="md:hidden h-16 bg-white border-t flex items-center justify-between px-4 shrink-0 z-20">
+                <div className="flex items-center gap-4 overflow-x-auto no-scrollbar">
+                    <button onClick={() => {
+                        pushToHistory([...nodes, {
+                            id: uuidv4(),
+                            type: 'text',
+                            x: 50, y: 50, // Closer to top-left for mobile
+                            text: 'Text',
+                            fontSize: 40,
+                            fontFamily: 'Inter',
+                            fill: '#000000',
+                            width: 200
+                        }]);
+                    }} className="flex flex-col items-center gap-1 text-zinc-600">
+                        <Type size={20} />
+                        <span className="text-[10px]">Text</span>
+                    </button>
+                    <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1 text-zinc-600">
+                        <ImageIcon size={20} />
+                        <span className="text-[10px]">Image</span>
+                    </button>
+                    <button onClick={() => {
+                        pushToHistory([...nodes, {
+                            id: uuidv4(),
+                            type: 'rect',
+                            x: 50, y: 50,
+                            width: 150, height: 150,
+                            fill: '#e4e4e7'
+                        }]);
+                    }} className="flex flex-col items-center gap-1 text-zinc-600">
+                        <Square size={20} />
+                        <span className="text-[10px]">Rect</span>
+                    </button>
+                    <button onClick={() => {
+                        pushToHistory([...nodes, {
+                            id: uuidv4(),
+                            type: 'circle',
+                            x: 100, y: 100,
+                            radius: 75,
+                            fill: '#e4e4e7'
+                        }]);
+                    }} className="flex flex-col items-center gap-1 text-zinc-600">
+                        <Circle size={20} />
+                        <span className="text-[10px]">Circle</span>
+                    </button>
+                </div>
+
+                <div className="w-px h-8 bg-zinc-200 mx-2"></div>
+
+                <div className="flex items-center gap-1">
+                    <button onClick={handleUndo} disabled={historyStep === 0} className="flex flex-col items-center gap-1 text-zinc-600 disabled:opacity-30">
+                        <Undo size={18} />
+                    </button>
+                    <button onClick={handleRedo} disabled={historyStep === history.length - 1} className="flex flex-col items-center gap-1 text-zinc-600 disabled:opacity-30">
+                        <Redo size={18} />
+                    </button>
+                </div>
+
+                <div className="w-px h-8 bg-zinc-200 mx-2"></div>
+
+                <button onClick={() => setShowMobileLayers(true)} className="flex flex-col items-center gap-1 text-zinc-600 relative">
+                    <Layers size={20} />
+                    <span className="text-[10px]">Layers</span>
+                    <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">
+                        {nodes.length}
+                    </span>
+                </button>
+            </div>
+
+            {/* Mobile Properties Floating Button (only if selected) */}
+            {selectedId && !showMobileProperties && (
+                <button
+                    onClick={() => setShowMobileProperties(true)}
+                    className="md:hidden absolute bottom-20 right-4 bg-black text-white p-3 rounded-full shadow-lg z-20 flex items-center justify-center"
+                >
+                    <Settings size={22} />
+                </button>
+            )}
+
+            {/* Mobile Layers Modal */}
+            {showMobileLayers && (
+                <div className="fixed inset-0 bg-white z-50 md:hidden flex flex-col">
+                    <div className="h-14 border-b flex items-center justify-between px-4 bg-white shrink-0">
+                        <h3 className="font-bold">Layers</h3>
+                        <button onClick={() => setShowMobileLayers(false)} className="text-sm font-medium">Done</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <LayersPanel
+                            nodes={nodes}
+                            selectedId={selectedId}
+                            onSelect={(id) => { setSelectedId(id); setShowMobileLayers(false); }}
+                            onDelete={(id) => {
+                                pushToHistory(nodes.filter(n => n.id !== id));
+                                if (selectedId === id) setSelectedId(null);
+                            }}
+                            onDuplicate={(id) => {
+                                const node = nodes.find(n => n.id === id);
+                                if (node) {
+                                    const newNode = { ...node, id: uuidv4(), x: node.x + 20, y: node.y + 20 };
+                                    pushToHistory([...nodes, newNode]);
+                                    setSelectedId(newNode.id);
+                                }
+                            }}
+                            onReorder={() => { }}
+                            onMoveLayer={(id, dir) => {
+                                const idx = nodes.findIndex(n => n.id === id);
+                                if (idx === -1) return;
+                                const newNodes = [...nodes];
+                                if (dir === 'up' && idx < newNodes.length - 1) {
+                                    [newNodes[idx], newNodes[idx + 1]] = [newNodes[idx + 1], newNodes[idx]];
+                                } else if (dir === 'down' && idx > 0) {
+                                    [newNodes[idx], newNodes[idx - 1]] = [newNodes[idx - 1], newNodes[idx]];
+                                }
+                                pushToHistory(newNodes);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Properties Modal */}
+            {showMobileProperties && selectedNode && (
+                <div className="fixed inset-0 bg-white z-50 md:hidden flex flex-col">
+                    <div className="h-14 border-b flex items-center justify-between px-4 bg-white shrink-0">
+                        <h3 className="font-bold">Properties</h3>
+                        <button onClick={() => setShowMobileProperties(false)} className="text-sm font-medium">Done</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-0">
+                        <PropertiesPanel
+                            selectedNode={selectedNode}
+                            onUpdate={(updates) => {
+                                const newNodes = nodes.map(n => n.id === selectedId ? { ...n, ...updates } : n);
+                                setNodes(newNodes);
+                                pushToHistory(newNodes);
+                            }}
+                            canvasWidth={presetDimensions.width}
+                            canvasHeight={presetDimensions.height}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

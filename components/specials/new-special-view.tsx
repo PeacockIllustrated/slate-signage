@@ -11,17 +11,18 @@ import { Suspense } from 'react';
 interface Props {
     clients?: { id: string; name: string }[];
     userClientId?: string; // If Client Admin, this is their ID. If Super Admin, this is undefined.
+    customTemplates?: any[];
 }
 
-export function NewSpecialView({ clients = [], userClientId }: Props) {
+export function NewSpecialView({ clients = [], userClientId, customTemplates = [] }: Props) {
     return (
         <Suspense fallback={<div className="p-8">Loading...</div>}>
-            <Content clients={clients} userClientId={userClientId} />
+            <Content clients={clients} userClientId={userClientId} customTemplates={customTemplates} />
         </Suspense>
     );
 }
 
-function Content({ clients = [], userClientId }: Props) {
+function Content({ clients = [], userClientId, customTemplates = [] }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [submitting, setSubmitting] = useState(false);
@@ -56,60 +57,56 @@ function Content({ clients = [], userClientId }: Props) {
         }
     };
 
+    const allTemplates = [...customTemplates, ...TEMPLATES];
+
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold mb-2">Create New Special</h1>
-                    <p className="text-gray-500">Choose a template or start from scratch</p>
+                    <h1 className="text-2xl font-bold mb-2 uppercase tracking-wide">Specials Studio</h1>
+                    <p className="text-gray-500">Select a template to prepare your screen.</p>
                 </div>
 
                 {/* Show Client Selector if multiple clients available (Super Admin) */}
                 {clients.length > 0 && (
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Creating for Client:</label>
+                    <div className="w-full md:w-auto">
+                        <label className="block text-xs text-xs font-bold uppercase text-gray-400 mb-1">Creating for Client:</label>
                         <ClientSelector clients={clients} activeClientId={effectiveClientId} />
                     </div>
                 )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Blank Landscape */}
-                <button
-                    disabled={submitting}
-                    onClick={() => handleCreate({ name: 'Landscape', canvas_preset: 'landscape_1080', design_json: { nodes: [], backgroundColor: '#ffffff' } })}
-                    className="border rounded-lg p-6 hover:border-black text-left flex flex-col items-center justify-center aspect-[16/9] bg-white"
-                >
-                    <div className="w-24 h-16 border-2 border-dashed border-gray-300 mb-4 bg-gray-50"></div>
-                    <span className="font-semibold">Blank Landscape</span>
-                    <span className="text-xs text-gray-400">1920 x 1080</span>
-                </button>
-
-                {/* Blank Portrait */}
-                <button
-                    disabled={submitting}
-                    onClick={() => handleCreate({ name: 'Portrait', canvas_preset: 'portrait_1080', design_json: { nodes: [], backgroundColor: '#ffffff' } })}
-                    className="border rounded-lg p-6 hover:border-black text-left flex flex-col items-center justify-center aspect-[9/16] bg-white"
-                >
-                    <div className="w-12 h-20 border-2 border-dashed border-gray-300 mb-4 bg-gray-50"></div>
-                    <span className="font-semibold">Blank Portrait</span>
-                    <span className="text-xs text-gray-400">1080 x 1920</span>
-                </button>
-
-                {TEMPLATES.map((tmpl, i) => (
+                {allTemplates.map((tmpl, i) => (
                     <button
                         key={i}
                         disabled={submitting}
                         onClick={() => handleCreate(tmpl)}
-                        className="border rounded-lg p-4 hover:border-black text-left transition-colors bg-white group"
+                        className="border rounded-lg p-4 hover:border-black text-left transition-all hover:shadow-md bg-white group relative overflow-hidden"
                     >
-                        <div className="bg-gray-100 rounded mb-4 aspect-video flex items-center justify-center text-gray-400 text-xs overflow-hidden relative">
-                            {/* Placeholder for template preview */}
-                            <div className="absolute inset-0 bg-gray-200 group-hover:bg-gray-300 transition-colors" />
-                            <span className="relative z-10">Preview</span>
+                        <div className="absolute top-3 right-3 z-10">
+                            <span className="bg-black/5 text-black/60 text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+                                {(tmpl.canvas_preset || 'landscape_1080').includes('portrait') ? 'Portrait' : 'Landscape'}
+                            </span>
                         </div>
-                        <h3 className="font-medium">{tmpl.name}</h3>
-                        <p className="text-xs text-gray-500 mt-1">{tmpl.canvas_preset}</p>
+
+                        <div className="bg-gray-100 rounded mb-4 aspect-video flex items-center justify-center text-gray-400 text-xs overflow-hidden relative">
+                            {tmpl.thumbnail_url ? (
+                                <img src={tmpl.thumbnail_url} alt={tmpl.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <>
+                                    <div className="absolute inset-0 bg-gray-50 group-hover:bg-gray-100 transition-colors" />
+                                    <div className="relative z-10 flex flex-col items-center gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                            <div className="w-4 h-4 bg-zinc-200 rounded-sm" />
+                                        </div>
+                                        <span className="font-medium text-zinc-400">Preview</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <h3 className="font-bold text-lg">{tmpl.name}</h3>
+                        <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-medium">{(tmpl.canvas_preset || 'landscape_1080').replace('_', ' ')}</p>
                     </button>
                 ))}
             </div>

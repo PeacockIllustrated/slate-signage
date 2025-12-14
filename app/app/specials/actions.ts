@@ -137,3 +137,40 @@ export async function publishSpecialThumbnail(formData: FormData) {
     return { success: true, data };
 }
 
+export async function getTemplates(clientId: string) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('specials_templates')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching templates:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function createTemplate(clientId: string, name: string, preset: string, designJson: any, thumbnailUrl?: string) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('specials_templates')
+        .insert({
+            client_id: clientId,
+            name,
+            canvas_preset: preset,
+            design_json: designJson,
+            thumbnail_url: thumbnailUrl
+        })
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(`Failed to create template: ${error.message}`);
+    }
+
+    revalidatePath('/app/specials/new');
+    return data;
+}
+

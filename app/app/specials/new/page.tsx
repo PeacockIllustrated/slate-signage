@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NewSpecialView } from '@/components/specials/new-special-view';
+import { getTemplates } from '../actions';
 import { redirect } from 'next/navigation';
 
 export default async function NewSpecialPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
@@ -23,5 +24,13 @@ export default async function NewSpecialPage({ searchParams }: { searchParams: P
         userClientId = profile?.client_id;
     }
 
-    return <NewSpecialView clients={clients} userClientId={userClientId} />;
+    // Determine effective client ID for fetching templates (default to user's client or first available)
+    const activeClientId = userClientId || (clients.length > 0 ? clients[0].id : undefined);
+
+    let customTemplates: any[] = [];
+    if (activeClientId) {
+        customTemplates = await getTemplates(activeClientId);
+    }
+
+    return <NewSpecialView clients={clients} userClientId={userClientId} customTemplates={customTemplates} />;
 }
