@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { updateSchedule, deleteSchedule } from '@/app/actions/update-schedule'
 import { useRouter } from 'next/navigation'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const DAYS = [
     { id: 0, label: 'Sun' },
@@ -51,56 +52,52 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
     return (
         <form action={handleUpdate} className="space-y-6">
             <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1">Schedule Name</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Schedule Name</label>
                 <input
                     name="name"
                     type="text"
                     defaultValue={schedule.name}
-                    className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                    className="w-full border-zinc-300 rounded-md bg-white px-3 py-2 text-sm text-zinc-900 focus:border-black focus:ring-black focus:outline-none transition-colors placeholder:text-zinc-400"
                     required
                 />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Days Active</label>
-                <div className="flex flex-wrap gap-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-3">Days Active</label>
+                <div className="flex flex-wrap gap-3">
                     {DAYS.map(day => (
-                        <label key={day.id} className="flex items-center space-x-2 bg-zinc-50 px-3 py-2 rounded border border-zinc-200 cursor-pointer hover:border-zinc-400 font-medium">
-                            <input
-                                type="checkbox"
+                        <div key={day.id} className="flex items-center">
+                            <Checkbox
+                                id={`day-${day.id}`}
                                 name="days"
                                 value={day.id}
                                 defaultChecked={schedule.days_of_week.includes(day.id)}
-                                className="rounded text-black focus:ring-black border-zinc-300"
+                                label={day.label}
                             />
-                            <span className="text-sm text-zinc-700">{day.label}</span>
-                        </label>
+                        </div>
                     ))}
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Start Time</label>
                     <input
                         name="startTime"
                         type="time"
                         defaultValue={schedule.start_time}
-                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                        className="w-full border-zinc-300 rounded-md bg-white px-3 py-2 text-sm text-zinc-900 focus:border-black focus:ring-black focus:outline-none transition-colors"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">End Time</label>
                     <input
                         name="endTime"
                         type="time"
                         defaultValue={schedule.start_time.split(':').length === 3 ? schedule.end_time : schedule.end_time + ':00'}
-                        // Note: Postgres TIME might return HH:MM:SS or HH:MM. Default value usually handles it but being safe.
-                        // Actually standard input time expects HH:MM, Postgres often gives HH:MM:SS.
-                        // Let's safe slice.
-                        key={schedule.end_time} // Force re-render if needed
-                        className="w-full border-zinc-300 rounded-md shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                        key={schedule.end_time}
+                        className="w-full border-zinc-300 rounded-md bg-white px-3 py-2 text-sm text-zinc-900 focus:border-black focus:ring-black focus:outline-none transition-colors"
                         required
                     />
                 </div>
@@ -110,14 +107,14 @@ export function EditScheduleForm({ schedule }: { schedule: Schedule }) {
                 <button
                     type="button"
                     onClick={handleDelete}
-                    className="text-red-600 text-sm hover:text-red-800 font-medium"
+                    className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                     Delete Schedule
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 font-medium disabled:opacity-50"
+                    className="bg-black text-white px-6 py-2 rounded text-sm font-bold uppercase tracking-wide hover:bg-zinc-800 disabled:opacity-50 transition-colors"
                 >
                     {loading ? 'Saving...' : 'Save Changes'}
                 </button>

@@ -24,9 +24,9 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
         <div className="space-y-6 max-w-6xl mx-auto">
             <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                 <div>
-                    <Link href="/app/schedules" className="text-sm text-gray-500 hover:underline mb-1 block">&larr; Back to Schedules</Link>
-                    <h1 className="text-2xl font-bold text-gray-900">{schedule.name}</h1>
-                    <p className="text-gray-500 text-sm">
+                    <Link href="/app/schedules" className="text-xs text-zinc-500 hover:text-zinc-900 mb-2 block transition-colors">&larr; Back to Schedules</Link>
+                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">{schedule.name}</h1>
+                    <p className="text-zinc-500 text-sm font-medium mt-1">
                         {schedule.store.name} • {schedule.start_time.slice(0, 5)} - {schedule.end_time.slice(0, 5)}
                     </p>
                 </div>
@@ -34,9 +34,9 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Content Assignment */}
-                <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
-                    <h2 className="text-lg font-medium mb-4">Content Assignment</h2>
-                    <p className="text-gray-500 text-sm mb-6">
+                <div className="lg:col-span-2 bg-white rounded-lg border border-zinc-200 p-6">
+                    <h2 className="text-lg font-bold text-zinc-900 mb-4">Content Assignment</h2>
+                    <p className="text-zinc-500 text-sm mb-6">
                         Assign specific media to screens during this time block.
                         If a screen is not assigned content here, it will fall back to its Default/Active content.
                     </p>
@@ -50,8 +50,8 @@ export default async function ScheduleDetailPage({ params }: { params: Promise<{
                 </div>
 
                 {/* Settings */}
-                <div className="bg-white rounded-lg shadow p-6 h-fit">
-                    <h2 className="text-lg font-medium mb-4">Settings</h2>
+                <div className="bg-white rounded-lg border border-zinc-200 p-6 h-fit">
+                    <h2 className="text-lg font-bold text-zinc-900 mb-4">Settings</h2>
                     <EditScheduleForm schedule={schedule} />
                 </div>
             </div>

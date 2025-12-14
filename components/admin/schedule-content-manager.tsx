@@ -57,33 +57,40 @@ export function ScheduleContentManager({ scheduleId, screens, media, assignments
                         const assignedMedia = assignment ? getMedia(assignment.media_asset_id) : null
 
                         return (
-                            <div key={screen.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
+                            <div key={screen.id} className="flex items-center justify-between p-4 border border-zinc-100 rounded-lg hover:bg-zinc-50 transition-colors">
                                 <div>
-                                    <h4 className="font-medium text-gray-900">{screen.name}</h4>
-                                    <p className="text-xs text-gray-500">{assignment ? 'Content Assigned' : 'Using Default Content'}</p>
+                                    <h4 className="font-bold text-zinc-900 text-sm mb-0.5">{screen.name}</h4>
+                                    <p className="text-xs text-zinc-500 font-medium">
+                                        {assignment ? (
+                                            <span className="text-green-600 flex items-center gap-1">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500" /> Content Assigned
+                                            </span>
+                                        ) : 'Using Default Content'}
+                                    </p>
                                 </div>
 
                                 <div className="flex items-center gap-4">
                                     {assignedMedia ? (
-                                        <div className="flex items-center gap-3 bg-white p-2 rounded border border-gray-200">
-                                            <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden">
+                                        <div className="flex items-center gap-3 bg-white p-2 pr-3 rounded border border-zinc-200 shadow-sm">
+                                            <div className="w-8 h-8 bg-zinc-100 rounded overflow-hidden flex-shrink-0">
                                                 <SignedImage path={assignedMedia.storage_path} alt="Thumb" className="object-cover w-full h-full" />
                                             </div>
-                                            <div className="text-sm max-w-[150px] truncate">{assignedMedia.filename}</div>
+                                            <div className="text-xs font-medium max-w-[120px] truncate">{assignedMedia.filename}</div>
                                             <button
                                                 onClick={() => handleRemove(assignment.id)}
                                                 disabled={submitting}
-                                                className="text-red-500 hover:text-red-700 p-1"
+                                                className="text-zinc-400 hover:text-red-600 transition-colors p-1"
+                                                title="Remove content"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
                                     ) : (
                                         <button
                                             onClick={() => setPickingForScreen(screen.id)}
-                                            className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                                            className="text-xs font-bold uppercase tracking-wide bg-zinc-900 text-white px-3 py-1.5 rounded hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
                                         >
-                                            <Plus size={16} /> Assign Content
+                                            <Plus size={14} /> Assign
                                         </button>
                                     )}
                                 </div>
