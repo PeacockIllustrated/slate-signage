@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { SignedImage } from '@/components/ui/signed-image'
 import { RefreshButton } from '@/components/portal/refresh-button'
 import { CreateScreenButton } from '@/components/admin/create-screen-button'
+import { ScreenCard } from '@/components/portal/screen-card'
 
 export default async function ScreenSetPage({ params }: { params: Promise<{ setId: string }> }) {
     const { setId } = await params
@@ -33,38 +34,6 @@ export default async function ScreenSetPage({ params }: { params: Promise<{ setI
     // Group screens
     const landscapeScreens = screens?.filter(s => s.orientation !== 'portrait') || []
     const portraitScreens = screens?.filter(s => s.orientation === 'portrait') || []
-
-    const ScreenCard = ({ screen }: { screen: any }) => {
-        const activeMedia = Array.isArray(screen.screen_content) ? screen.screen_content[0]?.media_asset : screen.screen_content?.media_asset
-        return (
-            <div
-                className={cn(
-                    "relative bg-white border-2 border-transparent hover:border-black transition-all shadow-sm rounded-lg overflow-hidden flex flex-col group",
-                    screen.orientation === 'portrait' ? "aspect-[9/16]" : "aspect-video",
-                )}
-            >
-                <div className="absolute top-2 left-2 z-10 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    {screen.name}
-                    <span className="ml-2 opacity-75">{screen.display_type}</span>
-                </div>
-
-                <div className="flex-1 bg-gray-800 flex items-center justify-center relative">
-                    {activeMedia ? (
-                        <SignedImage path={activeMedia.storage_path} alt="Screen Content" className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="text-gray-500 text-sm">No Content</div>
-                    )}
-                </div>
-
-                <div className="p-3 bg-white border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-                    <span>{screen.orientation}</span>
-                    <span className={cn("w-2 h-2 rounded-full", screen.last_seen_at ? "bg-green-500" : "bg-red-500")} />
-                </div>
-
-                <Link href={`/app/screens/${screen.id}`} className="absolute inset-0 z-20" aria-label={`Manage ${screen.name}`} />
-            </div>
-        )
-    }
 
     return (
         <div className="space-y-8 h-full flex flex-col">
