@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import { PLAN_DEFS, countClientScreens, PlanEntitlements } from '@/lib/slate/plans'; // Fixed imports
+import { PLAN_DEFS, PlanEntitlements } from '@/lib/slate/plans';
 import { PlanReadout } from '@/components/billing/PlanReadout';
 import { PlanSettingsForm } from './plan-settings-form';
 
