@@ -15,19 +15,34 @@ export default async function AppLayout({
         redirect('/auth/login')
     }
 
-    // Fetch profile for role
+    // Fetch profile for role and client_id
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, client_id')
         .eq('id', user.id)
         .single()
 
-    // Default to client_admin if safely failed, but ideally we should handle this
     const role = profile?.role || 'client_admin'
+    let clientName = ''
+
+    if (profile?.client_id) {
+        const { data: client } = await supabase
+            .from('clients')
+            .select('name')
+            .eq('id', profile.client_id)
+            .single()
+        if (client) {
+            clientName = client.name
+        }
+    }
 
     return (
         <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-            <Sidebar userRole={role} />
+            <Sidebar
+                userRole={role}
+                userEmail={user.email}
+                clientName={clientName}
+            />
             <main className="flex-1 overflow-y-auto p-4 md:p-8">
                 {children}
             </main>

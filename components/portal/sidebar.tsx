@@ -16,7 +16,11 @@ const navigation = [
     { name: 'Schedules', href: '/app/schedules', icon: Calendar },
 ]
 
-export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin' }) {
+export function Sidebar({ userRole, userEmail, clientName }: {
+    userRole: 'super_admin' | 'client_admin',
+    userEmail?: string,
+    clientName?: string
+}) {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
 
@@ -58,19 +62,34 @@ export function Sidebar({ userRole }: { userRole: 'super_admin' | 'client_admin'
                     })}
                 </nav>
             </div>
-            <div className="flex-shrink-0 flex border-t border-zinc-200 p-4">
-                <form action={logout} className="w-full">
-                    <button className="flex-shrink-0 w-full group block">
-                        <div className="flex items-center">
-                            <LogOut className="inline-block h-5 w-5 text-gray-400 group-hover:text-gray-500" />
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-zinc-700 group-hover:text-zinc-900">
-                                    Sign out
-                                </p>
+            <div className="flex-shrink-0 flex flex-col border-t border-zinc-200">
+                {/* User Profile Info */}
+                <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
+                    <p className="text-xs font-semibold text-zinc-900 truncate" title={userEmail}>
+                        {userEmail}
+                    </p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mt-0.5">
+                        {userRole === 'super_admin' ? 'Super Admin' : clientName || 'Client Admin'}
+                    </p>
+                    {userRole !== 'super_admin' && clientName && (
+                        <p className="text-[10px] text-zinc-400 mt-0.5">Admin</p>
+                    )}
+                </div>
+
+                <div className="p-4">
+                    <form action={logout} className="w-full">
+                        <button className="flex-shrink-0 w-full group block">
+                            <div className="flex items-center">
+                                <LogOut className="inline-block h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-zinc-700 group-hover:text-zinc-900">
+                                        Sign out
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </button>
-                </form>
+                        </button>
+                    </form>
+                </div>
             </div>
         </>
     )
