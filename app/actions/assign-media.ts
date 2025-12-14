@@ -44,5 +44,5 @@ export async function assignMedia(screenId: string, mediaAssetId: string) {
 
     await supabase.from('screens').update({ refresh_version: newVersion }).eq('id', screenId)
 
-    revalidatePath(`/app/screens/${screenId}`)
+    revalidatePath(`/app/screens/${screenId}`, 'page')
 }

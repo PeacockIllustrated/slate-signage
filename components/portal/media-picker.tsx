@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SignedImage } from '@/components/ui/signed-image'
 import { assignMedia } from '@/app/actions/assign-media'
 import { Check, X } from 'lucide-react'
+import { MediaPickerItem } from './media-picker-item'
 
 // Define Asset Type locally or import from types
 type Asset = {
@@ -51,15 +52,12 @@ export function MediaPicker({ screenId, assets }: { screenId: string, assets: As
 
             <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
                 {assets.map(asset => (
-                    <button
+                    <MediaPickerItem
                         key={asset.id}
+                        asset={asset}
                         disabled={saving}
                         onClick={() => handleSelect(asset.id)}
-                        className="relative aspect-square border border-gray-200 rounded overflow-hidden hover:ring-2 hover:ring-black focus:outline-none"
-                    >
-                        <SignedImage path={asset.storage_path} alt={asset.filename} className="w-full h-full object-cover" />
-                        {saving && <div className="absolute inset-0 bg-white/50 cursor-wait" />}
-                    </button>
+                    />
                 ))}
                 {assets.length === 0 && (
                     <div className="col-span-3 text-center text-xs text-gray-500 py-4">No assets found. Upload some first!</div>

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SignedImage } from '@/components/ui/signed-image'
 import { MediaPicker } from '@/components/portal/media-picker'
+import { EmptyScreenPreview } from '@/components/portal/empty-screen-preview'
 
 export default async function ScreenDetailPage({ params }: { params: Promise<{ screenId: string }> }) {
     const { screenId } = await params
@@ -19,6 +20,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
         *,
         store:stores(id, name),
         screen_content(
+            *,
             media_asset:media_assets(*)
         )
     `)
@@ -91,7 +93,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
                             {activeMedia ? (
                                 <SignedImage path={activeMedia.storage_path} alt="Preview" className="w-full h-full object-contain" />
                             ) : (
-                                <div className="text-white text-sm opacity-50">No Content</div>
+                                <EmptyScreenPreview />
                             )}
                             <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
                                 {screen.display_type} • {screen.orientation}
