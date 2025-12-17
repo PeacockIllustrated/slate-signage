@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { CreateClientButton } from '@/components/admin/create-client-button'
+import { HelpIcon } from '@/components/ui/help-icon'
 import { redirect } from 'next/navigation'
 
 export default async function ClientsPage() {
@@ -23,7 +24,10 @@ export default async function ClientsPage() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+                <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+                    <HelpIcon section="clients" />
+                </div>
                 <CreateClientButton />
             </div>
 

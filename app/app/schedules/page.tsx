@@ -3,6 +3,7 @@ import { CreateScheduleButton } from '@/components/admin/create-schedule-button'
 import { ClientSelector } from '@/components/portal/client-selector'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { HelpIcon } from '@/components/ui/help-icon'
 
 export default async function SchedulesPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
     const { clientId: searchClientId } = await searchParams
@@ -49,7 +50,10 @@ export default async function SchedulesPage({ searchParams }: { searchParams: Pr
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Schedules</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Schedules</h1>
+                        <HelpIcon section="schedules" />
+                    </div>
                     {role?.role === 'super_admin' && (
                         <ClientSelector clients={availableClients} />
                     )}

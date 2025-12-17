@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users, Store, Image, Calendar, LogOut, Menu, X } from 'lucide-react'
+import { Home, Users, Store, Image, Calendar, LogOut, Menu, X, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/app/(auth)/auth/login/actions'
 import { useState } from 'react'
@@ -14,6 +14,7 @@ const navigation = [
     { name: 'Media', href: '/app/media', icon: Image },
     { name: 'Specials', href: '/app/specials', icon: Image }, // Using Image icon for now, or Star/Sparkles if available
     { name: 'Schedules', href: '/app/schedules', icon: Calendar },
+    { name: 'User Guide', href: '/app/guide', icon: BookOpen },
 ]
 
 export function Sidebar({ userRole, userEmail, clientName }: {

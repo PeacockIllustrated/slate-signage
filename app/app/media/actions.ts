@@ -5,10 +5,41 @@ import { revalidatePath } from 'next/cache';
 
 export async function deleteMediaAsset(assetId: string, storagePath: string) {
     const supabase = await createClient();
+    const adminClient = await createAdminClient();
 
     try {
-        // 1. Delete from Storage
-        const { error: storageError } = await supabase.storage
+        // 1. Check User Permissions
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) throw new Error('Unauthorized');
+
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role, client_id')
+            .eq('id', user.id)
+            .single();
+
+        if (!profile) throw new Error('Profile not found');
+
+        // 2. Get Asset Metadata (to check ownership)
+        // Use admin client to ensure we can read it even if RLS is strict
+        const { data: asset, error: fetchError } = await adminClient
+            .from('media_assets')
+            .select('client_id')
+            .eq('id', assetId)
+            .single();
+
+        if (fetchError || !asset) throw new Error('Asset not found');
+
+        // 3. Verify Ownership / Role
+        const isSuperAdmin = profile.role === 'super_admin';
+        const isOwnerAdmin = profile.role === 'client_admin' && profile.client_id === asset.client_id;
+
+        if (!isSuperAdmin && !isOwnerAdmin) {
+            throw new Error('Unauthorized: Insufficient permissions to delete this asset');
+        }
+
+        // 4. Delete from Storage (using Admin Client)
+        const { error: storageError } = await adminClient.storage
             .from('slate-media')
             .remove([storagePath]);
 
@@ -17,14 +48,16 @@ export async function deleteMediaAsset(assetId: string, storagePath: string) {
             throw new Error('Failed to delete file from storage');
         }
 
-        // 2. Delete from DB
-        const { error: dbError } = await supabase
+        // 5. Delete from DB (using Admin Client)
+        const { error: dbError } = await adminClient
             .from('media_assets')
             .delete()
             .eq('id', assetId);
 
         if (dbError) {
             console.error('DB Delete Error:', dbError);
+            // Ideally should rollback storage deletion? Hard to do with simple remove.
+            // Just log it.
             throw new Error('Failed to delete record from database');
         }
 

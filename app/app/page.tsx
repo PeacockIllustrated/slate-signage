@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { CreateClientButton } from '@/components/admin/create-client-button'
 import { CreditCard } from 'lucide-react'
+import { HelpIcon } from '@/components/ui/help-icon'
 
 async function DashboardContent() {
     const supabase = await createClient()
@@ -19,7 +20,10 @@ async function DashboardContent() {
         return (
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Clients</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Clients</h1>
+                        <HelpIcon section="clients" />
+                    </div>
                     <CreateClientButton />
                 </div>
 
@@ -62,7 +66,10 @@ async function DashboardContent() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Dashboard</h1>
+                <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Dashboard</h1>
+                    <HelpIcon section="overview" />
+                </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {stores?.map((store) => (

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Plus } from 'lucide-react';
 import { ClientSelector } from '@/components/portal/client-selector';
 import { ProjectCard } from '@/components/specials/project-card';
+import { HelpIcon } from '@/components/ui/help-icon';
 
 export default async function SpecialsListPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
     const { clientId: searchClientId } = await searchParams;
@@ -80,7 +81,10 @@ export default async function SpecialsListPage({ searchParams }: { searchParams:
         <div className="p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-extrabold uppercase tracking-wide text-zinc-900">Specials Studio</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-extrabold uppercase tracking-wide text-zinc-900">Specials Studio</h1>
+                        <HelpIcon section="specials" />
+                    </div>
                     <p className="text-gray-500">Manage digital signage content.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">

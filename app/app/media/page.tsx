@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { MediaUploader } from '@/components/portal/media-uploader'
 import { ClientSelector } from '@/components/portal/client-selector'
 import { MediaItem } from './MediaItem'
+import { HelpIcon } from '@/components/ui/help-icon'
 
 export default async function MediaPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
     const { clientId: searchClientId } = await searchParams
@@ -49,7 +50,10 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Media Library</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-extrabold tracking-wide uppercase text-zinc-900">Media Library</h1>
+                        <HelpIcon section="media" />
+                    </div>
                     {role?.role === 'super_admin' && (
                         <ClientSelector clients={availableClients} />
                     )}
