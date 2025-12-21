@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, use } from 'react'
+import { NeverSleepGuard } from '@/components/player/never-sleep-guard'
 
 type Manifest = {
     screen_id: string
@@ -17,6 +18,7 @@ export default function PlayerPage({ params }: { params: Promise<{ token: string
     const { token } = use(params)
     const [manifest, setManifest] = useState<Manifest | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [isPlaying, setIsPlaying] = useState(false)
 
     // Polling Config
     const POLL_INTERVAL_MS = 60000 // Reduced strain (1 min)
@@ -138,29 +140,58 @@ export default function PlayerPage({ params }: { params: Promise<{ token: string
                 }
             }
         }
-        requestWakeLock()
+
+        if (isPlaying) {
+            requestWakeLock()
+        }
 
         const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') requestWakeLock()
+            if (document.visibilityState === 'visible' && isPlaying) requestWakeLock()
         }
         document.addEventListener('visibilitychange', handleVisibilityChange)
         return () => {
             if (wakeLock) wakeLock.release()
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
-    }, [])
+    }, [isPlaying])
+
+    const handleStart = () => {
+        setIsPlaying(true)
+        toggleFullscreen()
+    }
 
     if (!manifest && !error) return (
-        <div className="bg-black text-white h-screen flex items-center justify-center cursor-pointer" onClick={toggleFullscreen}>
+        // Initial loading state - wait for manifest before even showing "Start" if we want
+        // But showing "Start" early is fine too. Let's stick to simple loading first.
+        <div className="bg-black text-white h-screen flex items-center justify-center">
             Loading Slate...
         </div>
     )
+
+    if (!isPlaying) {
+        return (
+            <div
+                className="bg-black h-screen w-screen flex flex-col items-center justify-center text-white cursor-pointer z-50"
+                onClick={handleStart}
+            >
+                <div className="w-24 h-24 mb-6 rounded-full border-4 border-white flex items-center justify-center animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 ml-1">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                    </svg>
+                </div>
+                <h1 className="text-2xl font-bold tracking-widest uppercase mb-2">Slate Signage</h1>
+                <p className="text-gray-400 text-sm">Tap screen to initialize display</p>
+            </div>
+        )
+    }
 
     return (
         <div
             onClick={toggleFullscreen}
             className="bg-black h-screen w-screen overflow-hidden flex items-center justify-center relative cursor-pointer"
         >
+            <NeverSleepGuard active={isPlaying} />
+
             {manifest?.media?.url ? (
                 manifest.media.type?.startsWith('video/') ? (
                     <video
