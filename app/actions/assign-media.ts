@@ -17,10 +17,10 @@ export async function assignMedia(screenId: string, mediaAssetId: string) {
         .eq('active', true)
 
     // Check Entitlement (New)
-    const { data: media } = await supabase.from('media_assets').select('mime').eq('id', mediaAssetId).single()
+    const { data: media } = await supabase.from('media_assets').select('mime, client_id').eq('id', mediaAssetId).single()
     if (media && media.mime.startsWith('video/')) {
         const { getEntitlements, assertEntitlement } = await import('@/lib/auth/getEntitlements.server')
-        const entitlements = await getEntitlements()
+        const entitlements = await getEntitlements(media.client_id)
         assertEntitlement(entitlements, 'video_enabled')
     }
 
