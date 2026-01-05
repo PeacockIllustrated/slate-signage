@@ -7,8 +7,8 @@ export default function PricingPage() {
     return (
         <>
             <MarketingHero
-                headline="Transparent Pricing"
-                subhead="All plans include professional design. Slate operates designer-built systems — it does not replace them."
+                headline="Simple Menu Board Pricing"
+                subhead="Upload your menus, stream to your screens. Every plan includes scheduling and unlimited updates."
             />
 
             <SectionWrapper>
@@ -16,7 +16,7 @@ export default function PricingPage() {
                     tiers={[
                         {
                             name: "Slate Static",
-                            description: "Best for: small venues moving away from print",
+                            description: "Best for: single-location cafés and small restaurants",
                             price: "£39",
                             features: [
                                 "Up to 5 screens",
@@ -31,7 +31,7 @@ export default function PricingPage() {
                         },
                         {
                             name: "Slate Video",
-                            description: "Best for: venues running specials, promos, and seasonal content",
+                            description: "Best for: restaurants with daily specials and rotating menus",
                             price: "£59",
                             popular: true,
                             features: [
@@ -47,7 +47,7 @@ export default function PricingPage() {
                         },
                         {
                             name: "Slate Pro",
-                            description: "Best for: high-volume venues or multi-screen sites",
+                            description: "Best for: QSRs, food halls, and multi-screen venues",
                             price: "£89",
                             features: [
                                 "Everything in Video, plus:",
@@ -62,7 +62,7 @@ export default function PricingPage() {
                         },
                         {
                             name: "Slate Enterprise",
-                            description: "Best for: multi-venue brands and rollouts",
+                            description: "Best for: franchise groups and multi-location chains",
                             price: "POA",
                             features: [
                                 "Multi-location management",

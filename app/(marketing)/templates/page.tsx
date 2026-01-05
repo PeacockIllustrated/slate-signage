@@ -15,8 +15,8 @@ export default function TemplatesPage() {
     return (
         <>
             <MarketingHero
-                headline="Template Systems"
-                subhead="Build once. Deploy everywhere. A library of locked assets for your team."
+                headline="Menu Templates"
+                subhead="Beautiful menu layouts ready to use. Pick a style, add your items, and you're live."
                 primaryCta={{ href: "/contact", label: "Book a Demo" }}
             />
 

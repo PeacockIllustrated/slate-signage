@@ -29,6 +29,18 @@ export default async function NewSpecialPage({ searchParams }: { searchParams: P
 
     let customTemplates: any[] = [];
     if (activeClientId) {
+        // Feature Gate Check
+        const { data: plan } = await supabase.from('client_plans')
+            .select('specials_studio_enabled, design_package_included, managed_design_support')
+            .eq('client_id', activeClientId)
+            .single();
+
+        const isEnabled = plan?.specials_studio_enabled || plan?.design_package_included || plan?.managed_design_support || false;
+
+        if (!isEnabled) {
+            redirect('/app/specials');
+        }
+
         customTemplates = await getTemplates(activeClientId);
     }
 

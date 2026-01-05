@@ -1,26 +1,23 @@
 import { MarketingHero } from "@/components/marketing/MarketingHero";
 import { SectionWrapper } from "@/components/marketing/SectionWrapper";
 import { NumberedSteps } from "@/components/marketing/NumberedSteps";
-import { ScreenPreviewFrame } from "@/components/marketing/ScreenPreviewFrame";
-import { CaseStudyTile } from "@/components/marketing/CaseStudyTile";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Lock, History, MonitorCheck } from "lucide-react";
+import { ArrowRight, Zap, RotateCcw, Monitor, UserCheck } from "lucide-react";
 
 export default function MarketingHome() {
     return (
         <>
             <MarketingHero
-                pill="New: Specials Studio"
-                headline="Designer-approved menu updates, without the chaos."
-                subhead="The operational system for digital signage. Design defines the system. Slate operates it."
+                pill="Digital Menu Boards"
+                headline="Stream your menus. Schedule your day."
+                subhead="The menu display platform built for busy hospitality teams. Update prices, swap specials, and schedule content—all in seconds."
                 primaryCta={{ href: "/contact", label: "Book a Demo" }}
-                secondaryCta={{ href: "/product", label: "How it works" }}
+                secondaryCta={{ href: "/product", label: "See how it works" }}
             >
                 <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                    {/* Placeholder for actual screen mock */}
                     <div className="text-center">
-                        <span className="block text-white/40 font-mono text-sm mb-2">LIVE PREVIEW</span>
-                        <span className="text-3xl font-bold text-white tracking-widest">MENU BOARD 01</span>
+                        <span className="block text-white/40 font-mono text-sm mb-2">STREAMING LIVE</span>
+                        <span className="text-3xl font-bold text-white tracking-widest">LUNCH MENU</span>
                         <span className="block text-green-500 font-mono text-xs mt-4">● Synced 2m ago</span>
                     </div>
                 </div>
@@ -29,12 +26,10 @@ export default function MarketingHome() {
             <SectionWrapper dark>
                 <div className="max-w-3xl">
                     <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">
-                        Design defines the system.<br />
-                        Slate operates it.
+                        Menus that update themselves.
                     </h2>
                     <p className="text-xl text-neutral-400 leading-relaxed">
-                        Most digital signage tools try to be design tools, turning your menu boards into a chaotic canvas.
-                        Slate is different. We lock the layout and empower your team to update content safely, ensuring brand consistency at scale.
+                        Tired of USB sticks, print runs, and outdated boards? Slate streams your menu content directly to your screens—live, scheduled, or on-demand. Your breakfast menu at 6am, lunch at 11am, dinner at 5pm. Automatically.
                     </p>
                 </div>
             </SectionWrapper>
@@ -42,25 +37,25 @@ export default function MarketingHome() {
             <SectionWrapper>
                 <div className="mb-20">
                     <h2 className="text-3xl font-bold mb-4">How Slate works</h2>
-                    <p className="text-neutral-500 max-w-xl">A strict separation of concerns between design and operations.</p>
+                    <p className="text-neutral-500 max-w-xl">From kitchen to screen in four simple steps.</p>
                 </div>
                 <NumberedSteps
                     steps={[
                         {
-                            title: "Choose Template",
-                            description: "Select from designer-approved layouts. No blank canvases, ever.",
+                            title: "Pick your menu layout",
+                            description: "Start with beautiful, pre-built menu templates. No design skills needed.",
                         },
                         {
-                            title: "Edit Content",
-                            description: "Update prices, items, and specials in a safe, form-based interface.",
+                            title: "Update prices & items",
+                            description: "Change a price, add a special, swap an image—takes 30 seconds.",
                         },
                         {
-                            title: "Preview",
-                            description: "See exactly how it looks on the screen before going live.",
+                            title: "Schedule it",
+                            description: "Set your breakfast, lunch, and dinner menus to switch automatically.",
                         },
                         {
-                            title: "Publish",
-                            description: "Push updates to one or one thousand screens instantly.",
+                            title: "Stream to screens",
+                            description: "Content syncs instantly. Every screen. Every location.",
                         },
                     ]}
                 />
@@ -68,79 +63,57 @@ export default function MarketingHome() {
 
             <SectionWrapper className="bg-neutral-50">
                 <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-3xl font-bold mb-4">Protect the brand. Empower the team.</h2>
+                    <h2 className="text-3xl font-bold mb-4">Built for your team, not IT.</h2>
                     <p className="text-neutral-500">
-                        Features designed to keep your menus looking professional, no matter who updates them.
+                        Features that make menu management foolproof—so any staff member can help.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div className="p-8 bg-white rounded-2xl border border-neutral-200">
-                        <Lock className="h-8 w-8 text-neutral-950 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">Locked Layouts</h3>
+                        <Zap className="h-8 w-8 text-neutral-950 mb-6" />
+                        <h3 className="text-xl font-bold mb-3">Foolproof Editing</h3>
                         <p className="text-neutral-500">
-                            Designers define the constraints. Typography, spacing, and positioning are locked.
-                            Restaurant managers can only change what you allow them to change.
+                            Staff can update prices and specials without accidentally breaking the layout.
+                            Simple forms, not design tools.
                         </p>
                     </div>
 
                     <div className="p-8 bg-white rounded-2xl border border-neutral-200">
-                        <History className="h-8 w-8 text-neutral-950 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">History & Rollback</h3>
+                        <RotateCcw className="h-8 w-8 text-neutral-950 mb-6" />
+                        <h3 className="text-xl font-bold mb-3">Undo Mistakes Instantly</h3>
                         <p className="text-neutral-500">
-                            Made a mistake? Revert to the previous version in one click.
-                            Slate keeps a complete history of every change made to every screen.
+                            Wrong price? One click rolls back to the previous version.
+                            Complete history of every change, every screen.
                         </p>
                     </div>
 
                     <div className="p-8 bg-white rounded-2xl border border-neutral-200">
-                        <MonitorCheck className="h-8 w-8 text-neutral-950 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">Live Monitoring</h3>
+                        <Monitor className="h-8 w-8 text-neutral-950 mb-6" />
+                        <h3 className="text-xl font-bold mb-3">See Every Screen</h3>
                         <p className="text-neutral-500">
-                            See what's playing on every screen in real-time.
-                            Get alerts if a screen goes offline or content fails to sync.
+                            Real-time view of what's playing at every location.
+                            Get alerts if a screen goes offline.
                         </p>
                     </div>
 
                     <div className="p-8 bg-white rounded-2xl border border-neutral-200">
-                        <CheckCircle2 className="h-8 w-8 text-neutral-950 mb-6" />
-                        <h3 className="text-xl font-bold mb-3">Approval Workflows</h3>
+                        <UserCheck className="h-8 w-8 text-neutral-950 mb-6" />
+                        <h3 className="text-xl font-bold mb-3">Manager Approval</h3>
                         <p className="text-neutral-500">
-                            Optional approval steps for major changes.
-                            Ensure nothing goes live without a manager's sign-off.
+                            Optional sign-off before changes go live.
+                            Perfect for franchise operations.
                         </p>
                     </div>
                 </div>
             </SectionWrapper>
 
-            <SectionWrapper>
-                <h2 className="text-3xl font-bold mb-12">Proof of Impact</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <CaseStudyTile
-                        client="Burger & Co."
-                        metric="-4hrs"
-                        description="Weekly time saved on menu updates across 12 locations."
-                        href="/case-studies/burger-co"
-                    />
-                    <CaseStudyTile
-                        client="The Coffee House"
-                        metric="100%"
-                        description="Brand consistency compliance achieved in month one."
-                        href="/case-studies/coffee-house"
-                    />
-                    <CaseStudyTile
-                        client="Fresh Eats"
-                        metric="15min"
-                        description="Time to deploy emergency price changes to 50 screens."
-                        href="/case-studies/fresh-eats"
-                    />
-                </div>
-            </SectionWrapper>
 
-            < SectionWrapper dark className="text-center">
-                <h2 className="text-4xl font-bold mb-8">Ready to take control?</h2>
+
+            <SectionWrapper dark className="text-center">
+                <h2 className="text-4xl font-bold mb-8">Ready to ditch the USB sticks?</h2>
                 <p className="text-neutral-400 mb-10 max-w-xl mx-auto">
-                    Join the forward-thinking brands that treat digital signage as a professional operation, not a design project.
+                    Join hundreds of restaurants streaming smarter menus. No IT team required.
                 </p>
                 <Link
                     href="/contact"

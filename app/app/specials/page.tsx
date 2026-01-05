@@ -46,9 +46,9 @@ export default async function SpecialsListPage({ searchParams }: { searchParams:
     }
 
     // Check Entitlements (New)
-    const { data: plan } = await supabase.from('client_plans').select('specials_studio_enabled').eq('client_id', activeClientId).single();
+    const { data: plan } = await supabase.from('client_plans').select('specials_studio_enabled, design_package_included, managed_design_support').eq('client_id', activeClientId).single();
     // Default false if no plan found (safe default)
-    const isEnabled = plan?.specials_studio_enabled ?? false;
+    const isEnabled = plan?.specials_studio_enabled || plan?.design_package_included || plan?.managed_design_support || false;
 
     if (!isEnabled) {
         const { UpgradeGate } = await import('@/components/billing/UpgradeGate');
