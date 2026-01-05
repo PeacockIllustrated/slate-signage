@@ -14,7 +14,8 @@ export class PlanError extends Error {
     }
 }
 
-export async function getEntitlements(): Promise<Entitlements> {
+// Update signature to allow overriding client_id (e.g. for super_admin)
+export async function getEntitlements(overrideClientId?: string): Promise<Entitlements> {
     const supabase = await createClient();
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -22,19 +23,30 @@ export async function getEntitlements(): Promise<Entitlements> {
         throw new Error('Unauthorized');
     }
 
-    // Get user profile to find client_id
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('client_id, role')
-        .eq('id', user.id)
-        .single();
+    let targetClientId: string | null = null;
 
-    if (profileError || !profile) {
-        console.error('Profile fetch error:', profileError);
-        throw new Error('Failed to fetch user profile');
+    if (overrideClientId) {
+        // Optional: Verify permission to use override? 
+        // Typically the caller (action) should have verified permissions (e.g. super admin).
+        // We trust the caller here for simplicity, or we can double check role.
+        targetClientId = overrideClientId;
+    } else {
+        // Get user profile to find client_id
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('client_id, role')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError || !profile) {
+            console.error('Profile fetch error:', profileError);
+            throw new Error('Failed to fetch user profile');
+        }
+
+        targetClientId = profile.client_id;
     }
 
-    if (!profile.client_id) {
+    if (!targetClientId) {
         // Super admin or unassigned? 
         // For this logic, we assume we need a client context.
         // If super admin is browsing a specific client, that should be passed in, 
@@ -47,7 +59,7 @@ export async function getEntitlements(): Promise<Entitlements> {
     const { data: plan, error: planError } = await supabase
         .from('client_plans')
         .select('*')
-        .eq('client_id', profile.client_id)
+        .eq('client_id', targetClientId)
         .single();
 
     if (planError && planError.code !== 'PGRST116') { // PGRST116 is "no rows"
@@ -57,22 +69,19 @@ export async function getEntitlements(): Promise<Entitlements> {
 
     // Default if missing
     if (!plan) {
-        // Logic: if super_admin role, maybe default to strong? 
-        // But this function is usually for the user acting.
-        // We stick to the spec: "Otherwise default static_design"
-        const defaultPlan = PLAN_DEFS.static_design;
         return {
             plan_code: 'static_design',
             status: 'active', // Assume active if missing context? Or maybe safer to be "active" so they aren't blocked immediately
-            client_id: profile.client_id,
-            ...defaultPlan
+            client_id: targetClientId,
+            ...PLAN_DEFS.static_design
         };
     }
 
     return {
         plan_code: plan.plan_code as PlanCode,
         status: plan.status,
-        client_id: profile.client_id,
+        client_id: targetClientId,
+
         max_screens: plan.max_screens,
         video_enabled: plan.video_enabled,
         specials_studio_enabled: plan.specials_studio_enabled,

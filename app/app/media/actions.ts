@@ -93,7 +93,8 @@ export async function registerMediaAsset(
             // or just rely on getEntitlements() if it's the user acting.
             // Given the context is likely "User Uploading", getEntitlements is correct.
             const { getEntitlements, assertEntitlement } = await import('@/lib/auth/getEntitlements.server')
-            const entitlements = await getEntitlements()
+            // Pass clientId as override to allow super admins to upload on behalf of client
+            const entitlements = await getEntitlements(clientId)
             assertEntitlement(entitlements, 'video_enabled')
         }
 
