@@ -21,7 +21,7 @@ export default function ChezFritesInvoiceContent() {
         },
         from: {
             name: "Thomas Peacock",
-            email: "tom@slatesignage.com",
+            email: "tom@onesignanddigital.com",
         },
         items: [
             { description: "Menu Signage creation and software onboarding", amount: 400 },

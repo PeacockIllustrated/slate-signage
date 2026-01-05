@@ -1,8 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import { MarketingHero } from "@/components/marketing/MarketingHero";
 import { SectionWrapper } from "@/components/marketing/SectionWrapper";
+import { DemoModal } from "@/components/marketing/DemoModal";
 import { Mail, Calendar } from "lucide-react";
 
 export default function ContactPage() {
+    const [showDemoModal, setShowDemoModal] = useState(false);
+
     return (
         <>
             <MarketingHero
@@ -18,7 +24,10 @@ export default function ContactPage() {
                         </div>
                         <h3 className="text-xl font-bold mb-2">Book a Demo</h3>
                         <p className="text-neutral-500 mb-6">See a live walkthrough of the platform tailored to your needs.</p>
-                        <button className="w-full bg-neutral-950 text-white py-3 rounded-lg font-medium hover:bg-neutral-800 transition-colors">
+                        <button
+                            onClick={() => setShowDemoModal(true)}
+                            className="w-full bg-neutral-950 text-white py-3 rounded-lg font-medium hover:bg-neutral-800 transition-colors"
+                        >
                             Schedule Now
                         </button>
                     </div>
@@ -29,12 +38,21 @@ export default function ContactPage() {
                         </div>
                         <h3 className="text-xl font-bold mb-2">Email Sales</h3>
                         <p className="text-neutral-500 mb-6">Have questions? Drop us a line and we'll get back to you shortly.</p>
-                        <button className="w-full border border-neutral-200 text-neutral-950 py-3 rounded-lg font-medium hover:bg-neutral-50 transition-colors">
-                            hello@slatesignage.com
-                        </button>
+                        <a
+                            href="mailto:tom@onesignanddigital.com"
+                            className="w-full border border-neutral-200 text-neutral-950 py-3 rounded-lg font-medium hover:bg-neutral-50 transition-colors block"
+                        >
+                            tom@onesignanddigital.com
+                        </a>
                     </div>
                 </div>
             </SectionWrapper>
+
+            <DemoModal
+                isOpen={showDemoModal}
+                onClose={() => setShowDemoModal(false)}
+            />
         </>
     );
 }
+

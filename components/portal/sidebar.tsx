@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users, Store, Image, Calendar, LogOut, Menu, X, BookOpen } from 'lucide-react'
+import { Home, Users, Store, Image, Calendar, LogOut, Menu, X, BookOpen, UserPlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/app/(auth)/auth/login/actions'
 import { useState } from 'react'
@@ -10,6 +10,7 @@ import { useState } from 'react'
 const navigation = [
     { name: 'Overview', href: '/app', icon: Home },
     { name: 'Clients', href: '/app/clients', icon: Users, adminOnly: true },
+    { name: 'Prospects', href: '/app/prospects', icon: UserPlus, adminOnly: true },
     /* { name: 'Stores', href: '/app/stores', icon: Store }, // Stores are usually accessed via Clients or Overview for Super Admin */
     { name: 'Media', href: '/app/media', icon: Image },
     { name: 'Specials', href: '/app/specials', icon: Image }, // Using Image icon for now, or Star/Sparkles if available
